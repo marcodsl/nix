@@ -1,0 +1,9 @@
+keys:
+  - &host_armadillo age1yhvu6qr9ufw2ez323k2qwyzt2n2tjzmatg3sx9687shs3ny3q54q5ug8wj
+  - &user_marco age1j89grnvh75weerjxd0u5867l9009s46lrm0d26ms48dudmedx4ls362qax
+creation_rules:
+  - path_regex: secrets/(?:.+/)?[^/]+\.(yaml|json|env|ini)$
+    key_groups:
+      - age:
+          - *host_armadillo
+          - *user_marco

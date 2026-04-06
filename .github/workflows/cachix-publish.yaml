@@ -1,0 +1,50 @@
+name: cachix-publish
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows:
+      - secret-scan
+    types:
+      - completed
+    branches:
+      - main
+
+concurrency:
+  group: cachix-publish-${{ github.event.workflow_run.head_sha || github.sha }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v31
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
+          github_access_token: ${{ secrets.GITHUB_TOKEN }}
+          extra_nix_config: |
+            sandbox = true
+            experimental-features = nix-command flakes
+
+      - name: Authenticate with Cachix
+        uses: cachix/cachix-action@v15
+        with:
+          name: marcodsl
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+
+      - name: Check flake
+        run: nix flake check --no-pure-eval
+
+      - name: Build default package
+        run: nix build . --no-pure-eval

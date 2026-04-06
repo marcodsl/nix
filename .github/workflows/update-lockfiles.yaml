@@ -1,0 +1,58 @@
+name: update-lockfiles
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 0 * * 2,6"
+      timezone: "America/New_York"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  lockfile:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v31
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
+          github_access_token: ${{ secrets.GITHUB_TOKEN }}
+          extra_nix_config: |
+            sandbox = true
+            experimental-features = nix-command flakes
+
+      - name: Update flake.lock
+        run: nix flake update nixpkgs
+
+      - name: Update devenv.lock
+        run: nix run nixpkgs#devenv -- update
+
+      - name: Check for changes
+        id: check_changes
+        run: |
+          if git diff --quiet; then
+            echo "No changes to commit."
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          else
+            echo "Changes detected."
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create pull request
+        if: steps.check_changes.outputs.has_changes == 'true'
+        uses: peter-evans/create-pull-request@v8
+        with:
+          add-paths: |
+            devenv.lock
+            flake.lock
+          commit-message: "ci: update lockfiles"
+          branch: ci/update-lockfiles
+          delete-branch: true
+          title: "ci: update lockfiles"
+          body: Updates `flake.lock` and `devenv.lock`.
+          reviewers: |
+            marcodsl

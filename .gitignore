@@ -1,0 +1,10 @@
+result
+
+# Devenv
+.devenv*
+devenv.local.nix
+devenv.local.yaml
+
+# Burp Suite Pro (licensed and borderline illegally tweaked)
+packages/burp-suite-pro/*
+!packages/burp-suite-pro/.gitkeep
