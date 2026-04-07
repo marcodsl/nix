@@ -45,6 +45,9 @@ jobs:
           df -h /
           echo "::endgroup::"
 
+      - name: Disable AppArmor unprivileged user namespace restriction
+        run: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+
       - uses: actions/checkout@v6
         with:
           ref: ${{ github.event.workflow_run.head_sha || github.sha }}
