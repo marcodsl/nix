@@ -47,5 +47,29 @@ jobs:
       - name: Check flake
         run: nix flake check --no-pure-eval
 
-      - name: Build default package
-        run: nix build . --no-pure-eval
+      - name: Build NixOS system closures
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          mapfile -t hosts < <(
+            find configurations/nixos -mindepth 1 -maxdepth 1 \( -type d -o -name '*.nix' \) -printf '%f\n' \
+              | sed 's/\.nix$//' \
+              | sort -u
+          )
+
+          if [ "${#hosts[@]}" -eq 0 ]; then
+            echo "No NixOS hosts found under configurations/nixos" >&2
+            exit 1
+          fi
+
+          printf 'Discovered NixOS hosts: %s\n' "${hosts[*]}"
+
+          for host in "${hosts[@]}"; do
+            echo "::group::Build system closure for ${host}"
+            nix build ".#nixosConfigurations.${host}.config.system.build.toplevel" --no-pure-eval
+            echo "::endgroup::"
+          done
+
+      - name: Build activate launcher
+        run: nix build .#activate --no-pure-eval
