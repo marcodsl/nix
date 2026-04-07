@@ -24,6 +24,27 @@ jobs:
     permissions:
       contents: read
     steps:
+      - name: Clean up disk space
+        if: runner.os == 'Linux'
+        run: |
+          echo "::group::Disk usage before cleanup"
+          df -h /
+          echo "::endgroup::"
+
+          echo "::group::Cleaning up large directories"
+          sudo rm -rf /usr/lib/jvm
+          sudo rm -rf /usr/local/.ghcup
+          sudo rm -rf /usr/local/lib/android
+          sudo rm -rf /usr/local/share/powershell
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /usr/share/swift
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+          echo "::endgroup::"
+
+          echo "::group::Disk usage after cleanup"
+          df -h /
+          echo "::endgroup::"
+
       - uses: actions/checkout@v6
         with:
           ref: ${{ github.event.workflow_run.head_sha || github.sha }}
