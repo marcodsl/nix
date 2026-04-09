@@ -46,6 +46,7 @@ in {
 
   marco.services = {
     caddy.enable = true;
+    mullvad.enable = true;
     ollama.enable = true;
     tailscale.enable = true;
     vmware.enable = true;

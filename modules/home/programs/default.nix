@@ -9,6 +9,7 @@
     ./git.nix
     ./jujutsu.nix
     ./k9s.nix
+    ./mullvad.nix
     ./nix-index.nix
     ./obs.nix
     ./tmux.nix

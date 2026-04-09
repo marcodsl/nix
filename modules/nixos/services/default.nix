@@ -2,6 +2,7 @@
   imports = [
     ./caddy.nix
     ./loaders.nix
+    ./mullvad.nix
     ./ntpd.nix
     ./ollama.nix
     ./podman.nix
