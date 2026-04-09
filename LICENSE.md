@@ -1,7 +1,7 @@
 Portions of this repository are licensed as follows:
 
-- All content that resides under `modules/home/programs/opencode/` within this repository is licensed under the GNU Affero General Public License v3 only, except for any third-party material present in that subtree. The applicable AGPL-3.0 text for that subtree is defined in [`modules/home/programs/opencode/LICENSE.md`](modules/home/programs/opencode/LICENSE.md).
-- Any third-party material present in this repository, including any third-party material present under `modules/home/programs/opencode/`, remains subject to the original license terms, notices, and attribution requirements provided by the applicable licensors.
+- All content that resides under `modules/home/programs/ai/` within this repository is licensed under the GNU Affero General Public License v3 only, except for any third-party material present in that subtree. The applicable AGPL-3.0 text for that subtree is defined in [`modules/home/programs/ai/LICENSE.md`](modules/home/programs/ai/LICENSE.md).
+- Any third-party material present in this repository, including any third-party material present under `modules/home/programs/ai/`, remains subject to the original license terms, notices, and attribution requirements provided by the applicable licensors.
 - Content outside of the above-mentioned directory or restrictions is available under the Apache License 2.0 as defined below.
 
 ## Apache License 2.0

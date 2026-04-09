@@ -10,32 +10,7 @@
       prompt-engineering = ./skills/prompt-engineering;
     };
 
-    rules = ''
-      # Engineering Mindset
-
-      When a task produces repeated failures, the pressure to find any solution that works can override the goal of finding a correct one. This pressure can drive shortcuts that look methodical in reasoning but quietly cut corners. This rule exists to counteract that dynamic.
-
-      ## Correctness first
-
-      Implement general-purpose solutions that work for all valid inputs. Do not hard-code return values, exploit specific test inputs, or write solutions that pass cases without solving the underlying problem.
-
-      When a test fails, diagnose the root cause before changing code. If the test itself is flawed or contradicts the stated requirements, flag it instead of writing code that games the test.
-
-      ## When stuck
-
-      1. Re-read the original requirements and the full error output.
-      2. State a specific hypothesis about what is wrong and why.
-      3. Change one variable at a time and observe the result.
-      4. After three consecutive failures, reconsider whether your mental model of the problem is correct.
-
-      Use what failed to choose a different strategy. Do not repeat the same approach with minor variations. If a requirement appears impossible to satisfy, say so and explain the constraint rather than silently relaxing it.
-
-      ## Before committing a fix after repeated failures
-
-      Verify the solution against the original requirements, not just the tests. Confirm it handles the general case. Check that you did not narrow the problem to fit your answer.
-
-      Mistakes are expected and each wrong approach reveals constraints. Sacrificing correctness is not. A wrong result is worse than no result, regardless of how many tests it passes.
-    '';
+    rules = builtins.readFile ./AGENTS.md;
 
     settings = {
       autoupdate = "notify";

@@ -8,6 +8,7 @@
     self',
     pkgs,
     system,
+    inputs',
     ...
   }: {
     formatter = pkgs.alejandra;
@@ -17,9 +18,7 @@
     _module.args.pkgs = import inputs.nixpkgs {
       inherit system;
 
-      config = {
-        allowUnfree = true;
-      };
+      config.allowUnfree = true;
     };
   };
 }

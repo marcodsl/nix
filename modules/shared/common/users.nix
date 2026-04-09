@@ -39,9 +39,13 @@ in {
         }
     );
 
-    home-manager.users = mapListToAttrs config.users' (name: {
-      imports = [(self + /configurations/home/${name}.nix)];
-    });
+    home-manager = {
+      useGlobalPkgs = true;
+
+      users = mapListToAttrs config.users' (name: {
+        imports = [(self + /configurations/home/${name}.nix)];
+      });
+    };
 
     nix.settings.trusted-users = lib.singleton "root" ++ config.users';
   };

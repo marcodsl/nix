@@ -1,6 +1,6 @@
 {...}: {
   imports = [
-    ./opencode
+    ./ai
 
     ./delta.nix
     ./direnv.nix
