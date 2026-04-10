@@ -7,6 +7,7 @@
     alejandra
     git
     just
+    just-lsp
     nil
     sops
   ];

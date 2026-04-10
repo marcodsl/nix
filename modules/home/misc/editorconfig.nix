@@ -24,7 +24,12 @@
       "*.py".max_line_length = 80;
       "*.rs".indent_size = 4;
 
-      "Makefile".indent_style = "tab";
+      "{justfile,*.just}".indent_size = 4;
+
+      "{Makefile,makefile,*.mk}" = {
+        indent_style = "tab";
+        indent_size = "4";
+      };
     };
   };
 }
