@@ -10,14 +10,17 @@
       prompt-engineering = ./skills/prompt-engineering;
     };
 
-    rules = builtins.readFile ./AGENTS.md;
+    rules = ./AGENTS.md;
 
     settings = {
       autoupdate = "notify";
       compaction.reserved = 33000;
 
+      instructions = [
+        ./instructions/mcp-memory.md
+      ];
+
       plugin = [
-        "opencode-background-agents"
         "opencode-workspace"
       ];
 

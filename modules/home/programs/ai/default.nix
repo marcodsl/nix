@@ -2,5 +2,7 @@
 {...}: {
   imports = [
     ./opencode
+
+    ./mcp.nix
   ];
 }
