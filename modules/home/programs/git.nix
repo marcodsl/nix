@@ -130,6 +130,7 @@ in {
 
         url = {
           "https://github.com/".insteadOf = "github:";
+          "git@github.com:arbi-ai/".insteadOf = "https://github.com/arbi-ai/";
         };
       };
     };
