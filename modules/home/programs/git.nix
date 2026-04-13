@@ -85,6 +85,7 @@ in {
         init.defaultBranch = "main";
 
         core = {
+          editor = "vim";
           eol = "lf";
           whitespace = "fix,-indent-with-non-tab,trailing-space,cr-at-eol";
         };
