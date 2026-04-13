@@ -3,6 +3,7 @@
   imports = [
     ./opencode
 
+    ./cursor.nix
     ./mcp.nix
   ];
 }

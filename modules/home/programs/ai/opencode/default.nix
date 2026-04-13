@@ -5,9 +5,9 @@
     enableMcpIntegration = true;
 
     skills = {
-      coding-guidelines = ./skills/coding-guidelines;
-      natural-tone = ./skills/natural-tone;
-      prompt-engineering = ./skills/prompt-engineering;
+      coding-guidelines = ../skills/coding-guidelines;
+      natural-tone = ../skills/natural-tone;
+      prompt-engineering = ../skills/prompt-engineering;
     };
 
     rules = ./AGENTS.md;
