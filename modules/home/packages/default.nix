@@ -22,7 +22,7 @@
       github-copilot-cli
       jython
       nil
-      nodejs-slim
+      nodejs
       zx
 
       # Communication

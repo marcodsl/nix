@@ -14,11 +14,7 @@
     };
 
     # For macOS's default shell.
-    zsh = let
-      sessionPath = [
-        "$HOME/.local/bin"
-      ];
-    in {
+    zsh = {
       enable = true;
 
       autosuggestion = {
@@ -35,9 +31,14 @@
         # Custom ~/.zshenv goes here
       '';
 
-      profileExtra = ''
-        ${lib.concatMapStringsSep "\n" (p: "export PATH=\"${p}:$PATH\"") sessionPath}
-        export PATH="$HOME/.nix-profile/bin:$PATH"
+      profileExtra = let
+        paths = lib.concatStringsSep ":" [
+          "$HOME/.local/bin"
+          "$HOME/.npm-global/bin"
+          "$HOME/.nix-profile/bin"
+        ];
+      in ''
+        export PATH="${paths}:$PATH"
       '';
 
       loginExtra = ''
