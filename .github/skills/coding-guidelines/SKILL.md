@@ -24,7 +24,7 @@ Use this skill to plan, design, architect, or review software solutions in a str
 
 ### Do not use this skill when
 
-- The task only needs a quick style, formatting, or prose pass.
+- The task only needs a quick style, formatting, or prose pass. Use `natural-tone` for that.
 - The task is a narrow single-domain audit that does not need cross-cutting tradeoff analysis.
 - The user already asked for a tiny, direct fix and does not want an interactive planning, design, or review workflow.
 
@@ -61,7 +61,7 @@ Use these defaults unless the user gives different priorities:
 - Work through the discussion in this order: Architecture and system design -> Implementation quality -> Validation and test strategy -> Performance and scalability.
 - After each section, pause and ask for feedback before moving on.
 - If a section is in good shape, say so briefly, note any residual risk, and ask whether the user wants a deeper pass before continuing.
-- Keep the discussion focused on the most important concerns for the selected mode. Do not exhaustively list minor nits before surfacing major risks.
+- Surface major risks first. Address minor nits only after the important concerns are covered.
 - If no code exists yet, evaluate requirements, boundaries, interfaces, dependencies, failure modes, rollout risks, and validation strategy instead of inventing implementation details.
 
 ## 1. Architecture and system design

@@ -62,7 +62,7 @@ Name the actor, the action, and the result. If a word does not change the meanin
 - Avoid stacked adjectives before a noun.
 - Prefer plain transitions over filler bridges like "Additionally" when a simpler sentence works.
 
-6. Do not restate a claim in different words.
+6. State each claim once.
 
 - Say it once. If the reader needs more context, add a new fact, not a paraphrase.
 - Delete "In other words", "To put it simply", and "Essentially" when they introduce a restatement.
@@ -70,7 +70,7 @@ Name the actor, the action, and the result. If a word does not change the meanin
 7. Replace generic hedging with a bounded claim or an explicit stance.
 
 - "This can be beneficial in many scenarios" hides the scope. Write "This is a reasonable default for teams under 10 engineers" or name the actual constraint.
-- Do not pre-answer objections the reader has not raised. Trust the reader to ask.
+- Trust the reader to ask. Address objections when the reader raises them, not preemptively.
 
 8. Vary sentence rhythm and structure.
 
@@ -81,7 +81,7 @@ Name the actor, the action, and the result. If a word does not change the meanin
 
 9. Diversify sentence openers.
 
-- Do not start more than two consecutive sentences with the same word or the same structure.
+- Limit consecutive same-opener sentences to two. Rewrite at least one using a verb, object, condition, or dependent clause.
 - Watch for runs of "This [noun] [verb]s", "The [noun] [verb]s", or "By [verb]-ing". Rewrite at least one.
 - Start with the verb, the object, a condition, or a dependent clause when it reads more naturally.
 
@@ -93,13 +93,12 @@ Name the actor, the action, and the result. If a word does not change the meanin
 
 11. State tradeoffs directly.
 
-- Do not wrap a limitation in a consolation clause like "While X has some limitations, it provides significant...".
-- Name the cost first, then the benefit, or vice versa. Either order works. Merging them into one hedged sentence does not.
+- State the cost and the benefit as separate claims. Either order works. Merging them into one hedged sentence does not.
 
 12. Use the natural count in lists.
 
 - If the real count is two, list two. If it is five, list five.
-- Do not pad a list to three items or trim it to three. Readers notice when the third item is filler or when meaningful items are missing.
+- Use the natural count. Readers notice when the third item is filler or when meaningful items are missing.
 
 13. Vary paragraph structure.
 
@@ -109,7 +108,7 @@ Name the actor, the action, and the result. If a word does not change the meanin
 
 14. Keep register consistent within a section.
 
-- Do not mix formal and informal tone in the same paragraph. "Utilize" next to "cool" breaks trust.
+- Keep formal and informal tone separate. "Utilize" next to "cool" breaks trust.
 - Pick a register that fits the audience and hold it. Shift between sections if the audience context changes, not mid-thought.
 
 ## Technical terms and exceptions
@@ -118,7 +117,7 @@ Use technical terms when they improve precision for the intended audience.
 
 - Keep domain terms such as "idempotent", "eventual consistency", or "domain-specific" when replacing them would make the text less exact.
 - Keep protocol names, error classes, measured values, and implementation constraints when they carry real meaning.
-- Do not simplify away details that change the behavior, limits, or risks being described.
+- Preserve details that change the behavior, limits, or risks being described.
 
 ## Common filler and replacements
 

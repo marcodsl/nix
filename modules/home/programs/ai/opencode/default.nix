@@ -5,9 +5,13 @@
     enableMcpIntegration = true;
 
     skills = {
+      brainstorming = ../skills/brainstorming;
       coding-guidelines = ../skills/coding-guidelines;
       natural-tone = ../skills/natural-tone;
+      pressure-test = ../skills/pressure-test;
       prompt-engineering = ../skills/prompt-engineering;
+      refactor-planning = ../skills/refactor-planning;
+      rules-distill = ../skills/rules-distill;
     };
 
     rules = ./AGENTS.md;

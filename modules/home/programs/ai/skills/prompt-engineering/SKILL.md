@@ -9,7 +9,9 @@ metadata:
 
 # Prompt Engineering
 
-Rules for writing prompts that work well across LLM providers and for authoring coding-agent customization files.
+## Purpose
+
+Apply these rules when writing prompts for LLM providers and authoring coding-agent customization files.
 
 ## Scope
 
@@ -24,6 +26,10 @@ Rules for writing prompts that work well across LLM providers and for authoring 
 - The task is tightening prose tone or removing filler without changing prompt structure. Use `natural-tone` for prose quality inside prompts.
 - The task is a code design, architecture, or review decision. Use `coding-guidelines` for tradeoff analysis.
 - The task is writing end-user documentation where prompt structure and agent behavior are not the focus.
+
+## Governing rule
+
+Say exactly what you want; structure the prompt so the model can parse it without ambiguity.
 
 ## Coding agent vs model
 
@@ -218,7 +224,7 @@ Append a check step to catch errors, especially for code and math:
 Before finishing, verify your answer against these criteria: [list criteria].
 ```
 
-### Prevent overthinking
+### Keep reasoning focused
 
 If the model spends too many tokens deliberating:
 
@@ -308,7 +314,7 @@ Some models delegate to subagents without being told to. If this happens too agg
 Use subagents for parallel tasks, isolated workstreams, or tasks that don't need shared state. For single-file edits, sequential operations, or tasks where you need context across steps, work directly.
 ```
 
-### Minimize hallucination
+### Ground responses in source material
 
 ```xml
 <investigate_before_answering>
@@ -316,15 +322,15 @@ Never speculate about code you have not opened. If the user references a file, r
 </investigate_before_answering>
 ```
 
-### Prevent overengineering
+### Limit scope to what was requested
 
 ```
 Only make changes that are directly requested or clearly necessary.
 
-- Don't add features, refactoring, or abstractions beyond what was asked.
-- Don't add docstrings or comments to code you didn't change.
-- Don't add error handling for scenarios that can't happen.
-- Don't create helpers or utilities for one-time operations.
+- Limit changes to the requested scope. Leave unrelated features, refactoring, and abstractions for separate tasks.
+- Leave existing docstrings and comments unchanged unless you modified the surrounding code.
+- Add error handling only at system boundaries where invalid input is expected.
+- Inline one-time logic directly instead of wrapping it in helpers or utility abstractions.
 ```
 
 ### General solutions over test-passing hacks
@@ -420,7 +426,7 @@ Define the agent's identity, allowed tools, and behavioral constraints. Some age
 
 ## Anti-patterns
 
-These are common mistakes. Avoid them.
+These are common mistakes. Use the corrected patterns instead.
 
 **Vague instructions**: "Make it good" or "Be helpful" gives the model nothing to act on. Say what "good" means: format, length, audience, constraints.
 
@@ -438,11 +444,18 @@ These are common mistakes. Avoid them.
 
 **Conflicting instructions**: Multiple active customization files can produce contradictory behavior. Audit load order and remove conflicts.
 
-## Validation checklist
+## Verification checklist
 
-- Confirm discovery terms in `description` match likely user requests.
-- Confirm frontmatter parses correctly in the target environment.
-- Confirm portable files avoid vendor-only syntax.
-- Confirm vendor-specific files are isolated and clearly named.
-- Confirm stacked instruction layers have explicit precedence and no conflicts.
-- Confirm expected behavior in each target agent with at least one real prompt trial.
+- [ ] Stated the desired output format and constraints before the model starts generating.
+- [ ] Provided context and motivation for non-obvious constraints.
+- [ ] Included examples when output consistency matters.
+- [ ] Used structured tags or consistent markdown sections to separate content types.
+- [ ] Told the model what to do, not what to avoid.
+- [ ] Matched prompt formatting style to the desired output style.
+- [ ] Made tool-use behavior explicit: actions vs suggestions, sequential vs parallel.
+- [ ] Confirmed discovery terms in `description` match likely user requests.
+- [ ] Confirmed frontmatter parses correctly in the target environment.
+- [ ] Confirmed portable files avoid vendor-only syntax.
+- [ ] Confirmed vendor-specific files are isolated and clearly named.
+- [ ] Confirmed stacked instruction layers have explicit precedence and no conflicts.
+- [ ] Confirmed expected behavior in each target agent with at least one real prompt trial.
