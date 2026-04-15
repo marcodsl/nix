@@ -1,0 +1,36 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "type": "command",
+        "command": ".github/hooks/continual-learning/learn.sh SessionStart",
+        "cwd": ".",
+        "timeout": 5
+      }
+    ],
+    "PreToolUse": [
+      {
+        "type": "command",
+        "command": ".github/hooks/continual-learning/learn.sh PreToolUse",
+        "cwd": ".",
+        "timeout": 3
+      }
+    ],
+    "PostToolUse": [
+      {
+        "type": "command",
+        "command": ".github/hooks/continual-learning/learn.sh PostToolUse",
+        "cwd": ".",
+        "timeout": 3
+      }
+    ],
+    "Stop": [
+      {
+        "type": "command",
+        "command": ".github/hooks/continual-learning/learn.sh Stop",
+        "cwd": ".",
+        "timeout": 10
+      }
+    ]
+  }
+}
