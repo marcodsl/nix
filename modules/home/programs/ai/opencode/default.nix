@@ -7,11 +7,13 @@
     skills = {
       brainstorming = ../skills/brainstorming;
       coding-guidelines = ../skills/coding-guidelines;
+      google-aip-adoption = ../skills/google-aip-adoption;
       natural-tone = ../skills/natural-tone;
       pressure-test = ../skills/pressure-test;
       prompt-engineering = ../skills/prompt-engineering;
       refactor-planning = ../skills/refactor-planning;
       rules-distill = ../skills/rules-distill;
+      rust-coding = ../skills/rust-coding;
     };
 
     rules = ./AGENTS.md;
