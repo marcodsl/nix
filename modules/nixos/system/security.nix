@@ -1,11 +1,24 @@
 {
   config,
+  flake,
   lib,
   pkgs,
   ...
-}: {
+}: let
+  primaryUser = lib.head config.users';
+  primaryUserHome = config.users.users.${primaryUser}.home;
+
+  activateLocalSystem = let
+    repoRoot = "${primaryUserHome}/.config/nixos";
+  in
+    pkgs.callPackage (flake.inputs.self + /packages/activate-local-system) {
+      hostName = config.networking.hostName;
+      inherit repoRoot;
+    };
+in {
   config = {
     environment.systemPackages = with pkgs; [
+      activateLocalSystem
       clamav
     ];
 
@@ -29,6 +42,21 @@
     security.sudo-rs = {
       enable = lib.mkDefault true;
       wheelNeedsPassword = lib.mkDefault true;
+      extraRules = [
+        {
+          users = [primaryUser];
+          commands = [
+            {
+              command = "/run/current-system/sw/bin/activate-local-system";
+              options = ["NOPASSWD"];
+            }
+            {
+              command = lib.getExe activateLocalSystem;
+              options = ["NOPASSWD"];
+            }
+          ];
+        }
+      ];
     };
 
     services = {
