@@ -8,6 +8,7 @@
 in {
   programs.mcp = {
     enable = true;
+
     servers = {
       devenv = {
         command = devenv-mcp;

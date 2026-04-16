@@ -2,6 +2,7 @@
 {...}: {
   imports = [
     ./opencode
+    ./copilot
 
     ./cursor.nix
     ./mcp.nix
