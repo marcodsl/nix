@@ -1,3 +1,7 @@
+# VSCode settings
+.vscode/settings.json
+
+# Nix build results
 result
 
 # Devenv
@@ -8,3 +12,6 @@ devenv.local.yaml
 # Burp Suite Pro (licensed and borderline illegally tweaked)
 packages/burp-suite-pro/*
 !packages/burp-suite-pro/.gitkeep
+
+# Copilot learning database
+.copilot-memory/
