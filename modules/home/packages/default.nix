@@ -19,7 +19,6 @@
       biome
       cachix
       devenv
-      github-copilot-cli
       jython
       nil
       nodejs

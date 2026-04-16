@@ -1,24 +1,19 @@
 {
   config,
-  flake,
   lib,
   pkgs,
   ...
 }: let
   primaryUser = lib.head config.users';
-  primaryUserHome = config.users.users.${primaryUser}.home;
+  primaryUserConfig = config.users.users.${primaryUser};
 
-  activateLocalSystem = let
-    repoRoot = "${primaryUserHome}/.config/nixos";
-  in
-    pkgs.callPackage (flake.inputs.self + /packages/activate-local-system) {
-      hostName = config.networking.hostName;
-      inherit repoRoot;
-    };
+  repoRoot = "${primaryUserConfig.home}/.config/nixos";
+  hostName = config.networking.hostName;
+
+  hostFlakeRef = "${repoRoot}\\#${hostName}";
 in {
   config = {
     environment.systemPackages = with pkgs; [
-      activateLocalSystem
       clamav
     ];
 
@@ -47,11 +42,11 @@ in {
           users = [primaryUser];
           commands = [
             {
-              command = "/run/current-system/sw/bin/activate-local-system";
+              command = "/run/current-system/sw/bin/nixos-rebuild switch --flake ${hostFlakeRef}";
               options = ["NOPASSWD"];
             }
             {
-              command = lib.getExe activateLocalSystem;
+              command = "/run/current-system/sw/bin/nixos-rebuild dry-activate --flake ${hostFlakeRef}";
               options = ["NOPASSWD"];
             }
           ];
@@ -60,6 +55,8 @@ in {
     };
 
     services = {
+      gnome.gnome-keyring.enable = lib.mkDefault true;
+
       clamav = {
         daemon.enable = lib.mkDefault true;
         updater.enable = lib.mkDefault true;

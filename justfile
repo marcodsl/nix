@@ -34,8 +34,8 @@ check:
 dev:
     nix develop --no-pure-eval
 
-# Activate the current NixOS host
+# Activate the configuration
 [group('main')]
 run:
     #!/usr/bin/env bash
-    sudo /run/current-system/sw/bin/activate-local-system
+    nix run .#activate
