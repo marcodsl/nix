@@ -21,6 +21,8 @@
     };
 
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
+    nix-mineral.url = "github:cynicsketch/nix-mineral/";
+
     nixos-unified.url = "github:srid/nixos-unified";
 
     nix-index-database = {

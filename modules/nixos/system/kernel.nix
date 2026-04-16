@@ -20,64 +20,36 @@ in {
       tmp = {
         cleanOnBoot = true;
         useTmpfs = true;
-        tmpfsSize = "50%";
+        tmpfsSize = "25%";
       };
 
       kernelParams = [
-        # Reduce TTY output on boot
-        "quiet"
         "splash"
-        "threadirqs"
       ];
 
       kernel.sysctl = flattenAttrs' {
-        kernel = {
-          nmi_watchdog = 0;
-          split_lock_mitigate = 0;
-          sched_autogroup_enabled = 1;
-        };
         fs.inotify.max_user_watches = 524288;
-        net = {
-          core = {
-            default_qdisc = "cake";
-            netdev_max_backlog = 16384;
-          };
-          ipv4 = {
-            tcp_congestion_control = "bbr2";
-            tcp_fastopen = 3;
-            tcp_timestamps = 0;
-          };
-        };
+
         vm = {
           vfs_cache_pressure = 50;
-          swappiness = 10;
           dirty_ratio = 10;
         };
       };
 
       blacklistedKernelModules = [
-        # Bad Realtek driver
+        # Additional entries not covered by nix-mineral's Kicksecure blacklist
         "r8188eu"
-
-        # obscure network protocols
-        "ax25"
-        "netrom"
-        "rose"
 
         # Old or rare or insufficiently audited filesystems
         "adfs"
         "affs"
         "bfs"
         "befs"
-        "cramfs"
         "efs"
         "erofs"
         "exofs"
-        "freevxfs"
-        "f2f2"
-        "hfs"
+        "f2fs"
         "hpfs"
-        "jfs"
         "minix"
         "nilfs2"
         "ntfs"
@@ -89,34 +61,10 @@ in {
       ];
     };
 
-    services = {
-      lact.enable = true;
-
-      scx = {
-        enable = true;
-        scheduler = "scx_bpfland";
-      };
-    };
-
     hardware = {
       firmware = with pkgs; [linux-firmware];
 
-      amdgpu = {
-        initrd.enable = true;
-        overdrive.enable = true;
-        opencl.enable = true;
-      };
+      amdgpu.initrd.enable = true;
     };
-
-    systemd.tmpfiles.rules = [
-      "L+ /opt/rocm - - - - ${pkgs.rocmPackages.clr}"
-    ];
-
-    environment.systemPackages = with pkgs; [
-      clinfo
-      rocmPackages.clr
-      rocmPackages.rocblas
-      rocmPackages.hipblas
-    ];
   };
 }

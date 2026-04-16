@@ -29,6 +29,22 @@
     {device = "/dev/mapper/luks-8c82790b-f0b1-4924-9bf2-a33144b6b1b5";}
   ];
 
+  services = {
+    fstrim.enable = true;
+    power-profiles-daemon.enable = true;
+
+    scx = {
+      enable = true;
+      scheduler = "scx_lavd";
+    };
+  };
+
+  zramSwap = {
+    enable = true;
+    memoryPercent = 25;
+    priority = 100;
+  };
+
   hardware.enableRedistributableFirmware = true;
   hardware.cpu.amd.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
 
