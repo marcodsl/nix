@@ -20,7 +20,12 @@ in {
     };
 
     ".copilot/copilot-instructions.md".source = ./copilot-instructions.md;
-    ".copilot/instructions/memory-server.md".source = ./instructions/memory-server.md;
+
+    ".copilot/instructions" = {
+      source = ../instructions;
+      recursive = true;
+    };
+
 
     ".copilot/mcp-config.json".text = builtins.toJSON {
       mcpServers = copilotMcpServers;
