@@ -1,5 +1,22 @@
-{...}: {
+{
+  flake,
+  lib,
+  ...
+}: let
+  inherit (flake.inputs) self;
+in {
+  nixpkgs = {
+    config.allowUnfree = true;
+    overlays = lib.attrValues self.overlays;
+  };
+
   nix = {
+    nixPath = [
+      "nixpkgs=${flake.inputs.nixpkgs}"
+    ];
+
+    registry.nixpkgs.flake = flake.inputs.nixpkgs;
+
     optimise = {
       automatic = true;
       dates = ["03:45"];
@@ -49,7 +66,8 @@
       download-buffer-size = 512 * mib;
       http-connections = 50;
       keep-going = true;
-      max-jobs = 4;
+      max-call-depth = "1000000";
+      max-jobs = "auto";
       max-substitution-jobs = 32;
       narinfo-cache-negative-ttl = 300;
       stalled-download-timeout = 60;
@@ -61,9 +79,5 @@
         "cgroups"
       ];
     };
-  };
-
-  nixpkgs = {
-    config.allowUnfree = true;
   };
 }
