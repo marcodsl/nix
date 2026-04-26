@@ -46,14 +46,14 @@ Start with exhaustive collection, then switch to judgment.
 
 Collect all relevant inputs before analysis:
 
-1. Enumerate the skills in scope.
-2. Enumerate the shared rule sources in scope.
-3. Read the full text of those skills and rule sources.
+1. Enumerate the skills in scope. Use glob patterns (e.g., `**/*SKILL.md` or `**/skills/**/*.md`) to find skill files systematically.
+2. Enumerate the shared rule sources in scope. Use glob or grep to discover rule files in the environment.
+3. Read the full text of those skills and rule sources. Use parallel reads when possible for efficiency.
 4. Report the inventory counts before moving to analysis.
 
 Treat shared rule sources broadly. Depending on the environment, they may live in workspace instructions, agent rules, policy files, prompt libraries, or other always-on guidance layers. Discover them from the active workspace, tool configuration, or file layout instead of assuming a fixed path or filename.
 
-Prefer deterministic collection for this phase. Use listing, search, and file reads before judgment-heavy filtering.
+Prefer deterministic collection for this phase. Use listing, search, and file reads before judgment-heavy filtering. Always verify you have read the actual content before making determinations about what principles are present or absent.
 
 Present the inventory in a compact status block such as:
 
@@ -69,37 +69,48 @@ Proceeding to cross-read analysis...
 
 Include a candidate only when all of the following are true:
 
-1. The principle appears in 2 or more skills after combining evidence across the full working set.
-2. The principle is actionable in "do X" or "do not do Y" form.
-3. The principle has a clear violation risk.
-4. The principle is not already covered by the current shared rules, even if the wording differs.
-5. The principle is general enough to apply across tasks in the target environment.
+1. The principle appears in 2 or more skills after combining evidence across the full working set. Single-skill guidance stays in that skill.
+2. The principle is actionable in "do X" or "do not do Y" form, not vague or abstract.
+3. The principle has a clear violation risk - what goes wrong if the principle is ignored.
+4. The principle is not already covered by the current shared rules, even if the wording differs. Check semantic overlap, not just exact text.
+5. The principle is general enough to apply across tasks in the target environment, not specific to one language, framework, or tool.
 
 Exclude these cases:
 
 - Guidance that appears in only one skill.
-- Language-specific, framework-specific, or environment-specific detail that belongs in a specialized skill or scoped rule file.
+- Language-specific (e.g., "Use TypeScript strict mode"), framework-specific (e.g., "Use React hooks"), or environment-specific detail that belongs in a specialized skill or scoped rule file.
 - Commands, code snippets, or procedural examples that belong in skills rather than shared rules.
-- Abstract claims that do not change agent behavior.
+- Abstract claims that do not change agent behavior (e.g., "Write good code").
 
 ## Analysis and verdicts
 
 Analyze the full rules text against the relevant skills. If the platform supports read-only subagents, use them for thematic batches when that reduces context pressure. Otherwise analyze the skills sequentially in the main agent.
 
-Assign one verdict per candidate:
+Read existing shared rules before assigning verdicts. Check for semantic overlap, not just exact text matches. A principle is "Already Covered" if the existing rules capture the same concept, even if the wording differs.
 
-- `Append`: add to an existing section in an existing rule file.
-- `Revise`: replace inaccurate or insufficient rule text.
-- `New Section`: add a new section to an existing rule file.
-- `New File`: create a new rule file.
-- `Already Covered`: do not propose an edit because the rule set already covers the principle.
-- `Too Specific`: keep the guidance inside the skill layer.
+Assign one verdict per candidate using these decision criteria:
+
+- `Append`: The principle is new and fits naturally into an existing section of an existing rule file.
+- `Revise`: An existing rule exists but is inaccurate, incomplete, or needs replacement to properly cover the principle.
+- `New Section`: The principle is new and warrants its own section within an existing rule file.
+- `New File`: The principle represents a new category that warrants a separate rule file.
+- `Already Covered`: The existing rules already cover this principle, even if worded differently. No edit needed.
+- `Too Specific`: The guidance is language-specific, framework-specific, environment-specific, or otherwise belongs in a specialized skill rather than shared rules.
 
 Name the rule target precisely. If the target is ambiguous, read more of the relevant rule source before deciding.
 
-Bad: `Append to rules.md: Add LLM security principle`
+### Verdict examples
 
-Good: `Append to the shared input validation section: Treat model output stored in memory or knowledge stores as untrusted. Sanitize on write and validate on read.`
+**Bad**: `Append to rules.md: Add LLM security principle`
+**Good**: `Append to the shared input validation section: Treat model output stored in memory or knowledge stores as untrusted. Sanitize on write and validate on read.`
+
+**Too Specific verdict**:
+- Input: "TypeScript skills mention using strict null checks"
+- Output: `Too Specific: TypeScript null checking belongs in the TypeScript coding skill, not shared rules`
+
+**Already Covered verdict**:
+- Input: "Python and Rust skills both mention avoiding global mutable state"
+- After reading existing rules: `Already Covered: The shared state management section already prohibits global mutable state. Evidence: 'Minimize shared mutable state across components' in architecture-rules.md line 42.`
 
 ## Proposal format
 
