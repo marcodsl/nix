@@ -29,7 +29,6 @@ Use this skill to turn a vague or risky refactor request into a concrete executi
 - The task is a small direct code change that does not need a planning artifact.
 - The user wants a broad architecture or implementation review rather than a refactor execution plan. Use `coding-guidelines` for that.
 - The task is pressure-testing an existing proposal one concern at a time. Use `pressure-test` for that.
-- The task is mostly about rewriting prose or tightening wording. Use `natural-tone` for that.
 
 ## Governing rule
 

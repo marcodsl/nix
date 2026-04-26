@@ -27,8 +27,6 @@ Use this skill to write, review, or refactor Rust code with correctness-first de
 ### Do not use this skill when
 
 - The task is mainly about installing toolchains, configuring editors, or setting up CI rather than writing or reviewing Rust code.
-- The repository intentionally follows a documented Rust style that conflicts with these defaults and the task is not to change that policy.
-- The work is not meaningfully about Rust code structure, behavior, or validation.
 
 ## Governing rule
 

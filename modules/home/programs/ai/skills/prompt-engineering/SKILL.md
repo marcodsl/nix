@@ -24,8 +24,6 @@ Apply these rules when writing prompts for LLM providers and authoring coding-ag
 ### Do not use this skill when
 
 - The task is tightening prose tone or removing filler without changing prompt structure. Use `natural-tone` for prose quality inside prompts.
-- The task is a code design, architecture, or review decision. Use `coding-guidelines` for tradeoff analysis.
-- The task is writing end-user documentation where prompt structure and agent behavior are not the focus.
 
 ## Governing rule
 
@@ -385,6 +383,12 @@ The body contains the actual instructions. Write them as rules the model should 
 
 Bad: `This skill helps you write better APIs by providing guidelines...` Good: `Use plural nouns for collection endpoints. Return 201 for successful POST requests.`
 
+When you write `Use this skill when` and `Do not use this skill when`, treat them as routing controls, not symmetrical documentation.
+
+- `Use this skill when` should name concrete triggers that make this skill the right match.
+- `Do not use this skill when` should include only exclusions that prevent a plausible misroute or name a genuine non-use case.
+- Do not pad `Do not use this skill when` with tautological inverses of the `Use` bullets, low-probability alternate skills, or exclusions that only restate the skill's own scope.
+
 ### Writing instruction files portably
 
 Use neutral markdown first, then layer agent-specific syntax only where necessary. Scope instructions to specific files or directories when your agent supports path-level rules.
@@ -431,6 +435,8 @@ These are common mistakes. Use the corrected patterns instead.
 **Vague instructions**: "Make it good" or "Be helpful" gives the model nothing to act on. Say what "good" means: format, length, audience, constraints.
 
 **Negation without alternative**: "Don't use bullet points" leaves the model guessing. Say what to do instead: "Write items as sentences within paragraphs."
+
+**Filler exclusions**: `Do not use this skill when` sections padded with mirror-image inverses, low-probability alternates, or generic "not about X" statements create routing noise without changing behavior. Keep only exclusions that block a realistic misroute or name a true non-use case.
 
 **Over-prompting tools**: Adding "ALWAYS use tool X before answering" causes overtriggering on recent models. Use targeted conditions: "Use tool X when the question requires external data."
 
