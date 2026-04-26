@@ -6,12 +6,24 @@ default:
 [group('main')]
 update input="":
     #!/usr/bin/env bash
+    set -euo pipefail
     if [ -z "{{ input }}" ]; then
         nix flake update nixpkgs
     elif [ "{{ input }}" = "all" ]; then
         nix flake update
     else
-        nix flake update {{ input }}
+        if [[ "{{ input }}" == *,,* || "{{ input }}" == ,* || "{{ input }}" == *, ]]; then
+            echo "Error: empty input segment detected in '{{ input }}'" >&2
+            exit 1
+        fi
+        IFS=',' read -ra args <<< "{{ input }}"
+        for arg in "${args[@]}"; do
+            if [ "$arg" = "all" ]; then
+                echo "Error: 'all' cannot be used in a comma-separated list" >&2
+                exit 1
+            fi
+        done
+        nix flake update "${args[@]}"
     fi
 
 # Format Nix files in place

@@ -10,7 +10,18 @@
     just-lsp
     nil
     sops
+    zip
   ];
 
+  languages.python = {
+    enable = true;
+    uv.enable = true;
+  };
+
   languages.nix.enable = true;
+
+  # Nested `nix-shell` inherits exported environment variables from the active
+  # devenv shell. Dropping `shellHook` after activation prevents child shells
+  # from re-running the parent devenv hook without its DEVENV_* context.
+  unsetEnvVars = ["shellHook"];
 }
