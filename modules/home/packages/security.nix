@@ -54,6 +54,9 @@
       httpx
       katana
 
+      # Static analysis
+      semgrep
+
       # Web enumeration & testing
       feroxbuster
       ffuf
@@ -66,7 +69,8 @@
 
       # Proxying & traffic analysis
       burp-suite
-      caido
+      caido-cli
+      caido-desktop
       mitmproxy
       mitmproxy2swagger
 

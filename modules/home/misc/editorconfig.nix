@@ -21,7 +21,7 @@
       };
 
       "*.{sh,bash}".max_line_length = 80;
-      "*.py".max_line_length = 80;
+      "*.py".max_line_length = 88;
       "*.rs".indent_size = 4;
 
       "{justfile,*.just}".indent_size = 4;

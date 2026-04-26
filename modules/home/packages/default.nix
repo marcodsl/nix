@@ -17,6 +17,7 @@
       act
       alejandra
       biome
+      bun
       cachix
       devenv
       jython

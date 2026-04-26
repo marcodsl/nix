@@ -2,6 +2,7 @@
   imports = [
     ./ai
 
+    ./astral.nix
     ./delta.nix
     ./direnv.nix
     ./gh.nix
@@ -13,9 +14,9 @@
     ./nix-index.nix
     ./obs.nix
     ./tmux.nix
-    ./uv.nix
     ./yt-dlp.nix
     ./zk.nix
+    ./zed.nix
   ];
 
   programs = {
