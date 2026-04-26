@@ -1,0 +1,262 @@
+{
+  "skill_name": "rules-distill",
+  "evals": [
+    {
+      "id": 1,
+      "eval_name": "basic discovery",
+      "prompt": "I have several coding skills that all mention input validation. Should this be a shared rule?",
+      "files": [],
+      "expected_output": "Agent should discover skills, read their content, identify repeated validation principles, and propose whether to promote to shared rules",
+      "grading_mode": "hybrid",
+      "baseline_strategy": "prompt_only",
+      "assertions": [
+        {
+          "assertion_id": "discovers-skills",
+          "type": "contains",
+          "path": "outputs/response.md",
+          "needle": "skill",
+          "case_sensitive": false
+        },
+        {
+          "assertion_id": "reads-skills",
+          "type": "tool_call_seen",
+          "path": "outputs/trace.json",
+          "tool": "read",
+          "min_count": 2
+        },
+        {
+          "assertion_id": "identifies-repetition",
+          "type": "semantic_assertion",
+          "path": "outputs/response.md",
+          "prompt": "Decide whether the response identifies whether input validation appears in multiple skills and provides evidence of this repetition.",
+          "rubric": ["Fails if response only mentions one skill or no evidence", "Passes if response identifies the principle in 2+ skills with specific evidence"]
+        },
+        {
+          "assertion_id": "provides-verdict",
+          "type": "semantic_assertion",
+          "path": "outputs/response.md",
+          "prompt": "Decide whether the response provides a clear verdict on whether to promote the principle to shared rules (Append, New Section, Already Covered, or Too Specific).",
+          "rubric": ["Fails if response only lists findings without a decision", "Passes if response makes a clear recommendation with justification"]
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "eval_name": "discovery phase",
+      "prompt": "Review my skills and find principles that should become shared rules.",
+      "files": [],
+      "expected_output": "Agent should enumerate skills, enumerate shared rule sources, read both, report inventory, analyze for repeated principles, and propose candidates",
+      "grading_mode": "hybrid",
+      "baseline_strategy": "prompt_only",
+      "assertions": [
+        {
+          "assertion_id": "enumerates-skills",
+          "type": "tool_call_seen",
+          "path": "outputs/trace.json",
+          "tool": "glob",
+          "min_count": 1
+        },
+        {
+          "assertion_id": "reports-inventory",
+          "type": "semantic_assertion",
+          "path": "outputs/response.md",
+          "prompt": "Decide whether the response reports counts of skills scanned and rule sources found before starting analysis.",
+          "rubric": ["Fails if analysis starts without inventory counts", "Passes if response includes skill count and rule source count before analyzing"]
+        },
+        {
+          "assertion_id": "reads-multiple-skills",
+          "type": "tool_call_seen",
+          "path": "outputs/trace.json",
+          "tool": "read",
+          "min_count": 3
+        },
+        {
+          "assertion_id": "structured-candidates",
+          "type": "semantic_assertion",
+          "path": "outputs/response.md",
+          "prompt": "Decide whether candidates are presented in a structured format with verdict, evidence, and target fields.",
+          "rubric": ["Fails if candidates are vague recommendations", "Passes if each candidate includes principle, evidence sources, verdict, and target rule location"]
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "eval_name": "candidate filtering - too specific",
+      "prompt": "I have a TypeScript skill that says to use strict null checks. Should this be promoted to a shared rule?",
+      "files": [],
+      "expected_output": "Agent should recognize this is language-specific and not promote it, applying the 'Too Specific' verdict",
+      "grading_mode": "hybrid",
+      "baseline_strategy": "prompt_only",
+      "assertions": [
+        {
+          "assertion_id": "checks-repetition",
+          "type": "semantic_assertion",
+          "path": "outputs/response.md",
+          "prompt": "Decide whether the response checks if the principle appears in multiple skills, not just one.",
+          "rubric": ["Fails if doesn't mention checking other skills", "Passes if explicitly checks or mentions need for 2+ skills"]
+        },
+        {
+          "assertion_id": "recognizes-specificity",
+          "type": "semantic_assertion",
+          "path": "outputs/response.md",
+          "prompt": "Decide whether the response recognizes that TypeScript-specific guidance should stay in the TypeScript skill.",
+          "rubric": ["Fails if recommends promoting TypeScript-specific rule", "Passes if identifies this as language-specific and not suitable for shared rules"]
+        },
+        {
+          "assertion_id": "no-promotion",
+          "type": "semantic_assertion",
+          "path": "outputs/response.md",
+          "prompt": "Decide whether the response recommends NOT promoting this principle to shared rules.",
+          "rubric": ["Fails if recommends promotion", "Passes if explicitly rejects promotion with Too Specific or similar verdict"]
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "eval_name": "verdict assignment",
+      "prompt": "Three of my coding skills mention avoiding shell injection vulnerabilities. What should I do?",
+      "files": [],
+      "expected_output": "Agent should identify this as repeated security guidance, check existing rules, and propose appropriate verdict (Append, New Section, or Already Covered)",
+      "grading_mode": "hybrid",
+      "baseline_strategy": "prompt_only",
+      "assertions": [
+        {
+          "assertion_id": "identifies-repetition",
+          "type": "semantic_assertion",
+          "path": "outputs/response.md",
+          "prompt": "Decide whether the response recognizes this principle appears in multiple skills (3+) and meets the repetition threshold.",
+          "rubric": ["Fails if doesn't acknowledge repetition across skills", "Passes if notes this appears in 3 skills and meets promotion criteria"]
+        },
+        {
+          "assertion_id": "checks-existing-rules",
+          "type": "tool_call_seen",
+          "path": "outputs/trace.json",
+          "tool": "read",
+          "min_count": 1
+        },
+        {
+          "assertion_id": "assigns-verdict",
+          "type": "regex",
+          "path": "outputs/response.md",
+          "pattern": "(Append|Revise|New Section|New File|Already Covered)"
+        },
+        {
+          "assertion_id": "provides-evidence",
+          "type": "semantic_assertion",
+          "path": "outputs/response.md",
+          "prompt": "Decide whether the response cites which specific skills contain the shell injection guidance.",
+          "rubric": ["Fails if no skill names or evidence cited", "Passes if mentions or lists the skills that contain this principle"]
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "eval_name": "proposal format",
+      "prompt": "Find repeated principles in my skills and format them as rule candidates with evidence and verdicts.",
+      "files": [],
+      "expected_output": "Agent should produce structured proposals with all required fields: principle, evidence, violation_risk, verdict, target_rule, confidence",
+      "grading_mode": "hybrid",
+      "baseline_strategy": "prompt_only",
+      "assertions": [
+        {
+          "assertion_id": "structured-output",
+          "type": "semantic_assertion",
+          "path": "outputs/response.md",
+          "prompt": "Decide whether proposals are structured with principle, evidence, verdict, and target fields clearly identified.",
+          "rubric": ["Fails if proposals are unstructured prose", "Passes if uses JSON, table, or structured format with labeled fields"]
+        },
+        {
+          "assertion_id": "actionable-principles",
+          "type": "semantic_assertion",
+          "path": "outputs/response.md",
+          "prompt": "Decide whether principles are stated in actionable 'do X' or 'do not Y' form rather than abstract descriptions.",
+          "rubric": ["Fails if principles are vague or abstract", "Passes if principles are concrete actions or prohibitions"]
+        },
+        {
+          "assertion_id": "includes-violation-risk",
+          "type": "semantic_assertion",
+          "path": "outputs/response.md",
+          "prompt": "Decide whether the response explains what goes wrong if principles are violated.",
+          "rubric": ["Fails if no risk or consequence mentioned", "Passes if includes violation risk or impact for candidates"]
+        },
+        {
+          "assertion_id": "confidence-ratings",
+          "type": "regex",
+          "path": "outputs/response.md",
+          "pattern": "(high|medium|low)"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "eval_name": "asks approval before edits",
+      "prompt": "Analyze my skills and promote repeated guidance to shared rules.",
+      "files": [],
+      "expected_output": "Agent should present candidates and ask for approval before making rule edits, unless explicitly told to execute directly",
+      "grading_mode": "hybrid",
+      "baseline_strategy": "prompt_only",
+      "assertions": [
+        {
+          "assertion_id": "presents-candidates",
+          "type": "semantic_assertion",
+          "path": "outputs/response.md",
+          "prompt": "Decide whether rule candidates are presented in a reviewable format before any edits.",
+          "rubric": ["Fails if candidates not shown or only mentioned", "Passes if candidates presented with sufficient detail for review"]
+        },
+        {
+          "assertion_id": "asks-approval",
+          "type": "semantic_assertion",
+          "path": "outputs/response.md",
+          "prompt": "Decide whether the response asks the user to approve, modify, or skip candidates before editing shared rules.",
+          "rubric": ["Fails if makes edits without asking or doesn't request approval", "Passes if explicitly asks for user approval before proceeding"]
+        },
+        {
+          "assertion_id": "no-premature-edits",
+          "type": "semantic_assertion",
+          "path": "outputs/response.md",
+          "prompt": "Decide whether the response avoids editing shared rule files without user approval.",
+          "rubric": ["Fails if edits files in the response", "Passes if only presents candidates without making actual edits"]
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "eval_name": "already covered check",
+      "prompt": "My Python and Rust skills both mention avoiding global mutable state. I already have a shared rule about this. What should I do?",
+      "files": [],
+      "expected_output": "Agent should check existing rules, identify semantic overlap, and assign 'Already Covered' verdict",
+      "grading_mode": "hybrid",
+      "baseline_strategy": "prompt_only",
+      "assertions": [
+        {
+          "assertion_id": "reads-existing-rules",
+          "type": "tool_call_seen",
+          "path": "outputs/trace.json",
+          "tool": "read",
+          "min_count": 1
+        },
+        {
+          "assertion_id": "semantic-overlap",
+          "type": "semantic_assertion",
+          "path": "outputs/response.md",
+          "prompt": "Decide whether the response recognizes semantic overlap between the skill guidance and existing rule, even if wording differs.",
+          "rubric": ["Fails if only checks for exact text match", "Passes if identifies conceptual overlap despite different wording"]
+        },
+        {
+          "assertion_id": "already-covered-verdict",
+          "type": "contains",
+          "path": "outputs/response.md",
+          "needle": "Already Covered",
+          "case_sensitive": false
+        },
+        {
+          "assertion_id": "explains-coverage",
+          "type": "semantic_assertion",
+          "path": "outputs/response.md",
+          "prompt": "Decide whether the response explains which existing rule covers the principle so the user understands why no edit is needed.",
+          "rubric": ["Fails if just says 'already covered' without explanation", "Passes if identifies the specific existing rule that covers this principle"]
+        }
+      ]
+    }
+  ]
+}
