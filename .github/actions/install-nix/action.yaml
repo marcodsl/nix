@@ -1,0 +1,40 @@
+name: "Install Nix"
+description: "Installs the Nix package manager on GitHub Actions runners."
+
+inputs:
+  nix_path:
+    description: "The NIX_PATH to use when installing Nix."
+    required: false
+    default: "nixpkgs=channel:nixos-unstable"
+
+  extra_nix_config:
+    description: "Extra Nix configuration to add to /etc/nix/nix.conf."
+    required: false
+    default: |
+      sandbox = false
+
+  auth_token:
+    description: "Optional Cachix auth token used for cache pushes."
+    required: false
+    default: ""
+
+runs:
+  using: "composite"
+  steps:
+    - uses: cachix/install-nix-action@v31
+      with:
+        nix_path: ${{ inputs.nix_path }}
+        extra_nix_config: ${{ inputs.extra_nix_config }}
+
+    - if: ${{ inputs.auth_token == '' }}
+      uses: cachix/cachix-action@v17
+      with:
+        name: marcodsl
+        extraPullNames: cachix,devenv,nix-community
+
+    - if: ${{ inputs.auth_token != '' }}
+      uses: cachix/cachix-action@v17
+      with:
+        name: marcodsl
+        authToken: ${{ inputs.auth_token }}
+        extraPullNames: cachix,devenv,nix-community
