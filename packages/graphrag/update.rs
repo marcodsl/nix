@@ -165,12 +165,11 @@ fn prefetch(url: &str) -> Result<String, String> {
 }
 
 /// Removes an existing SRI sha256 prefix so callers can add one consistently.
-fn normalize_sha256_hash(hash: String) -> String {
-    if let Some(stripped) = hash.strip_prefix("sha256-") {
-        stripped.to_string()
-    } else {
-        hash
+fn normalize_sha256_hash(mut hash: String) -> String {
+    if hash.starts_with("sha256-") {
+        hash.replace_range(.."sha256-".len(), "");
     }
+    hash
 }
 
 fn json_string(json: &str, key: &str) -> Option<String> {
