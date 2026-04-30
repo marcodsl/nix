@@ -110,15 +110,11 @@ fn prefetch(url: &str) -> Result<String, String> {
         return Err(format!("nix-prefetch-url returned an empty hash for {url}"));
     }
 
-    Ok(normalize_sha256_hash(hash))
+    Ok(normalize_sha256_hash(&hash).to_string())
 }
 
-/// Removes an existing SRI sha256 prefix so callers can add one consistently.
-fn normalize_sha256_hash(mut hash: String) -> String {
-    if hash.starts_with("sha256-") {
-        hash.drain(0..7);
-    }
-    hash
+fn normalize_sha256_hash(hash: &str) -> &str {
+    hash.strip_prefix("sha256-").unwrap_or(hash)
 }
 
 fn json_string(json: &str, key: &str) -> Option<String> {
