@@ -1,0 +1,32 @@
+name: "Disk Cleanup"
+description: "Frees disk space on GitHub Actions runners by removing large pre-installed toolchains."
+
+runs:
+  using: "composite"
+  steps:
+    - name: Clean up disk space
+      if: runner.os == 'Linux'
+      shell: bash
+      run: |
+        echo "::group::Disk usage before cleanup"
+        df -h /
+        echo "::endgroup::"
+
+        echo "::group::Cleaning up large directories"
+        sudo rm -rf /usr/lib/jvm
+        sudo rm -rf /usr/local/.ghcup
+        sudo rm -rf /usr/local/lib/android
+        sudo rm -rf /usr/local/share/powershell
+        sudo rm -rf /usr/share/dotnet
+        sudo rm -rf /usr/share/swift
+        sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+        echo "::endgroup::"
+
+        echo "::group::Disk usage after cleanup"
+        df -h /
+        echo "::endgroup::"
+
+    - name: Disable AppArmor unprivileged user namespace restriction
+      if: runner.os == 'Linux'
+      shell: bash
+      run: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0

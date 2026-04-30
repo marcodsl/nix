@@ -53,7 +53,6 @@ jobs:
           comment-summary-in-pr: always
 
   semgrep:
-    needs: [lint, check]
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -75,7 +74,6 @@ jobs:
           sarif_file: semgrep-results.sarif
 
   trivy:
-    needs: [lint, check]
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -99,97 +97,57 @@ jobs:
         with:
           sarif_file: trivy-results.sarif
 
+  gitleaks:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@ff98106e4c7b2bc287b24eaf42907196329070c7 # v2.3.9
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_NOTIFY_USER_LIST: "@marcodsl"
+
   build-packages:
-    needs: [lint, check, trivy, semgrep]
+    needs: [lint, check]
     runs-on: ubuntu-latest
     permissions:
       contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        package: [codex, context-mode, graphrag]
     steps:
-      - name: Clean up disk space
-        if: runner.os == 'Linux'
-        run: |
-          echo "::group::Disk usage before cleanup"
-          df -h /
-          echo "::endgroup::"
-
-          echo "::group::Cleaning up large directories"
-          sudo rm -rf /usr/lib/jvm
-          sudo rm -rf /usr/local/.ghcup
-          sudo rm -rf /usr/local/lib/android
-          sudo rm -rf /usr/local/share/powershell
-          sudo rm -rf /usr/share/dotnet
-          sudo rm -rf /usr/share/swift
-          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
-          echo "::endgroup::"
-
-          echo "::group::Disk usage after cleanup"
-          df -h /
-          echo "::endgroup::"
-
-      - name: Disable AppArmor unprivileged user namespace restriction
-        run: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
-
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           persist-credentials: false
+
+      - uses: ./.github/actions/disk-cleanup
 
       - uses: ./.github/actions/install-nix
         with:
           auth_token: ${{ secrets.CACHIX_AUTH_TOKEN }}
 
-      - name: Build packages
-        shell: bash
-        run: |
-          set -euo pipefail
-          for pkg in codex context-mode graphrag; do
-            echo "::group::Build ${pkg}"
-            nix build ".#${pkg}" --no-pure-eval
-            echo "::endgroup::"
-          done
+      - name: Build ${{ matrix.package }}
+        run: nix build ".#${{ matrix.package }}" --no-pure-eval
 
-  build-system-closures:
-    needs: [lint, check, trivy, semgrep]
+  discover-hosts:
+    needs: [lint, check]
     runs-on: ubuntu-latest
     permissions:
       contents: read
+    outputs:
+      hosts: ${{ steps.discover.outputs.hosts }}
     steps:
-      - name: Clean up disk space
-        if: runner.os == 'Linux'
-        run: |
-          echo "::group::Disk usage before cleanup"
-          df -h /
-          echo "::endgroup::"
-
-          echo "::group::Cleaning up large directories"
-          sudo rm -rf /usr/lib/jvm
-          sudo rm -rf /usr/local/.ghcup
-          sudo rm -rf /usr/local/lib/android
-          sudo rm -rf /usr/local/share/powershell
-          sudo rm -rf /usr/share/dotnet
-          sudo rm -rf /usr/share/swift
-          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
-          echo "::endgroup::"
-
-          echo "::group::Disk usage after cleanup"
-          df -h /
-          echo "::endgroup::"
-
-      - name: Disable AppArmor unprivileged user namespace restriction
-        run: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
-
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           persist-credentials: false
 
-      - uses: ./.github/actions/install-nix
-        with:
-          auth_token: ${{ secrets.CACHIX_AUTH_TOKEN }}
-
-      - name: Build NixOS system closures
-        shell: bash
+      - name: Discover NixOS hosts
+        id: discover
         run: |
-          set -euo pipefail
-
           mapfile -t hosts < <(
             find configurations/nixos -mindepth 1 -maxdepth 1 \( -type d -o -name '*.nix' \) -printf '%f\n' \
               | sed 's/\.nix$//' \
@@ -198,19 +156,39 @@ jobs:
 
           if [ "${#hosts[@]}" -eq 0 ]; then
             echo "No NixOS hosts found under configurations/nixos" >&2
-            exit 1
+            echo 'hosts=[]' >> "$GITHUB_OUTPUT"
+            exit 0
           fi
 
           printf 'Discovered NixOS hosts: %s\n' "${hosts[*]}"
+          echo "hosts=$(printf '%s\n' "${hosts[@]}" | jq -R -s -c 'split("\n")[:-1]')" >> "$GITHUB_OUTPUT"
 
-          for host in "${hosts[@]}"; do
-            echo "::group::Build system closure for ${host}"
-            nix build ".#nixosConfigurations.${host}.config.system.build.toplevel" --no-pure-eval
-            echo "::endgroup::"
-          done
+  build-system-closures:
+    needs: [discover-hosts]
+    if: needs.discover-hosts.outputs.hosts != '[]'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        host: ${{ fromJSON(needs.discover-hosts.outputs.hosts) }}
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
+      - uses: ./.github/actions/disk-cleanup
+
+      - uses: ./.github/actions/install-nix
+        with:
+          auth_token: ${{ secrets.CACHIX_AUTH_TOKEN }}
+
+      - name: Build system closure for ${{ matrix.host }}
+        run: nix build ".#nixosConfigurations.${{ matrix.host }}.config.system.build.toplevel" --no-pure-eval
 
   build-activate:
-    needs: [lint, check, trivy, semgrep]
+    needs: [lint, check]
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -218,7 +196,7 @@ jobs:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           persist-credentials: false
-          
+
       - uses: ./.github/actions/install-nix
         with:
           auth_token: ${{ secrets.CACHIX_AUTH_TOKEN }}

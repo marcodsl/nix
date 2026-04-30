@@ -10,11 +10,7 @@ use std::process::{Command, Stdio};
 
 const NPM_REGISTRY: &str = "https://registry.npmjs.org";
 
-const DEPENDENCIES: [&str; 3] = [
-    "turndown",
-    "turndown-plugin-gfm",
-    "@mixmark-io/domino",
-];
+const DEPENDENCIES: [&str; 3] = ["turndown", "turndown-plugin-gfm", "@mixmark-io/domino"];
 
 fn main() {
     if let Err(error) = run() {
@@ -33,7 +29,10 @@ fn run() -> Result<(), String> {
     println!("latest version:  {version}");
 
     let context_mode_hash = prefetch(&npm_tarball_url("context-mode", &version))?;
-    println!("context-mode: {}", npm_tarball_url("context-mode", &version));
+    println!(
+        "context-mode: {}",
+        npm_tarball_url("context-mode", &version)
+    );
 
     let mut dep_hashes = Vec::new();
     for dep in &DEPENDENCIES {
