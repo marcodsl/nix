@@ -41,7 +41,6 @@
 
         format = {
           line-ending = "lf";
-          skip-magic-trailing-comma = true;
         };
       };
     };

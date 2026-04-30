@@ -1,4 +1,4 @@
-{pkgs, ...}: {
+{...}: {
   imports = [
     ./direnv.nix
     ./nano.nix
@@ -10,11 +10,5 @@
       localsend.enable = true;
       zsh.enable = true;
     };
-
-    environment.systemPackages = with pkgs; [
-      dnsutils
-      lshw
-      pciutils
-    ];
   };
 }

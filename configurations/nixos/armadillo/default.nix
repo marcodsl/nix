@@ -66,11 +66,20 @@ in {
     };
   };
 
-  marco.services = {
-    caddy.enable = true;
-    mullvad.enable = true;
-    ollama.enable = true;
-    tailscale.enable = true;
-    vmware.enable = true;
+  marco = {
+    wifi = {
+      interface = "wlp2s0";
+      staticAddress = "192.168.0.108/24";
+      gateway = "192.168.0.1";
+      dns = "9.9.9.9 149.112.112.112";
+    };
+
+    services = {
+      caddy.enable = true;
+      mullvad.enable = true;
+      ollama.enable = true;
+      tailscale.enable = true;
+      vmware.enable = true;
+    };
   };
 }

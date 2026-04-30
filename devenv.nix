@@ -13,12 +13,19 @@
     zip
   ];
 
-  languages.python = {
-    enable = true;
-    uv.enable = true;
-  };
+  languages = {
+    nix.enable = true;
 
-  languages.nix.enable = true;
+    python = {
+      enable = true;
+      uv.enable = true;
+    };
+
+    rust = {
+      enable = true;
+      mold.enable = pkgs.stdenv.isLinux;
+    };
+  };
 
   # Nested `nix-shell` inherits exported environment variables from the active
   # devenv shell. Dropping `shellHook` after activation prevents child shells
