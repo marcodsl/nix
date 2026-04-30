@@ -24,33 +24,11 @@ jobs:
     permissions:
       contents: read
     steps:
-      - name: Clean up disk space
-        if: runner.os == 'Linux'
-        run: |
-          echo "::group::Disk usage before cleanup"
-          df -h /
-          echo "::endgroup::"
-
-          echo "::group::Cleaning up large directories"
-          sudo rm -rf /usr/lib/jvm
-          sudo rm -rf /usr/local/.ghcup
-          sudo rm -rf /usr/local/lib/android
-          sudo rm -rf /usr/local/share/powershell
-          sudo rm -rf /usr/share/dotnet
-          sudo rm -rf /usr/share/swift
-          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
-          echo "::endgroup::"
-
-          echo "::group::Disk usage after cleanup"
-          df -h /
-          echo "::endgroup::"
-
-      - name: Disable AppArmor unprivileged user namespace restriction
-        run: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
-
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           persist-credentials: false
+
+      - uses: ./.github/actions/disk-cleanup
 
       - uses: ./.github/actions/install-nix
         with:

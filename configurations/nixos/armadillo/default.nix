@@ -71,7 +71,7 @@ in {
       interface = "wlp2s0";
       staticAddress = "192.168.0.108/24";
       gateway = "192.168.0.1";
-      dns = "9.9.9.9 149.112.112.112";
+      dns = "1.1.1.1 1.0.0.1";
     };
 
     services = {

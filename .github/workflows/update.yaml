@@ -37,6 +37,16 @@ jobs:
 
   update-packages:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - package: codex
+            script: packages/codex/update.rs
+          - package: graphrag
+            script: packages/graphrag/update.rs
+          - package: context-mode
+            script: packages/context-mode/update.rs
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
@@ -44,23 +54,14 @@ jobs:
 
       - uses: ./.github/actions/install-nix
 
-      - name: Run codex update script
-        run: nix-shell -i rust-script packages/codex/update.rs
+      - name: Run ${{ matrix.package }} update script
+        run: nix-shell -i rust-script ${{ matrix.script }}
 
-      - name: Run graphrag update script
-        run: nix-shell -i rust-script packages/graphrag/update.rs
-
-      - name: Run context-mode update script
-        run: nix-shell -i rust-script packages/context-mode/update.rs
-
-      - name: Upload package changes
+      - name: Upload ${{ matrix.package }} changes
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: package-changes
-          path: |
-            packages/codex/default.nix
-            packages/graphrag/default.nix
-            packages/context-mode/default.nix
+          name: package-${{ matrix.package }}
+          path: packages/${{ matrix.package }}/default.nix
           if-no-files-found: ignore
 
   create-pr:
@@ -79,7 +80,8 @@ jobs:
       - name: Download package changes
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
-          name: package-changes
+          pattern: package-*
+          merge-multiple: true
           path: .
         continue-on-error: true
 
