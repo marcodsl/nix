@@ -3,6 +3,8 @@
   python3Packages,
   fetchurl,
 }: let
+  py = python3Packages;
+
   version = "3.0.9";
 
   wheel = {
@@ -11,7 +13,7 @@
   }:
     fetchurl {inherit url hash;};
 
-  nest-asyncio2 = python3Packages.buildPythonPackage {
+  nest-asyncio2 = py.buildPythonPackage {
     pname = "nest-asyncio2";
     version = "1.7.2";
     format = "wheel";
@@ -24,7 +26,7 @@
     doCheck = false;
   };
 
-  graphrag-common = python3Packages.buildPythonPackage {
+  graphrag-common = py.buildPythonPackage {
     pname = "graphrag-common";
     inherit version;
     format = "wheel";
@@ -33,7 +35,7 @@
       hash = "sha256-ZcLayImSKM924ENhHKAI26MYv+uroUle6wFnEG2Z4fk=";
     };
 
-    dependencies = with python3Packages; [
+    dependencies = with py; [
       python-dotenv
       pyyaml
       toml
@@ -44,7 +46,7 @@
     doCheck = false;
   };
 
-  graphrag-storage = python3Packages.buildPythonPackage {
+  graphrag-storage = py.buildPythonPackage {
     pname = "graphrag-storage";
     inherit version;
     format = "wheel";
@@ -53,7 +55,7 @@
       hash = "sha256-YmIYWsLwgi0kREMqT6iS04XSHgNvJ6uQh5IulS1s1TQ=";
     };
 
-    dependencies = with python3Packages; [
+    dependencies = with py; [
       aiofiles
       azure-cosmos
       azure-identity
@@ -68,7 +70,7 @@
     doCheck = false;
   };
 
-  graphrag-cache = python3Packages.buildPythonPackage {
+  graphrag-cache = py.buildPythonPackage {
     pname = "graphrag-cache";
     inherit version;
     format = "wheel";
@@ -87,7 +89,7 @@
     doCheck = false;
   };
 
-  graphrag-chunking = python3Packages.buildPythonPackage {
+  graphrag-chunking = py.buildPythonPackage {
     pname = "graphrag-chunking";
     inherit version;
     format = "wheel";
@@ -97,7 +99,7 @@
     };
 
     dependencies = [
-      python3Packages.pydantic
+      py.pydantic
       graphrag-common
     ];
 
@@ -106,7 +108,7 @@
     doCheck = false;
   };
 
-  graphrag-input = python3Packages.buildPythonPackage {
+  graphrag-input = py.buildPythonPackage {
     pname = "graphrag-input";
     inherit version;
     format = "wheel";
@@ -115,7 +117,7 @@
       hash = "sha256-vVHOqQLl1bjt9l1A5gp/JjREGXU3eJhrODcXYHPA8GU=";
     };
 
-    dependencies = with python3Packages; [
+    dependencies = with py; [
       markitdown
       pyarrow
       pydantic
@@ -128,7 +130,7 @@
     doCheck = false;
   };
 
-  graphrag-llm = python3Packages.buildPythonPackage {
+  graphrag-llm = py.buildPythonPackage {
     pname = "graphrag-llm";
     inherit version;
     format = "wheel";
@@ -137,7 +139,7 @@
       hash = "sha256-cvPFd1hLL2Sc+belgkNrrfBQ6l2HxEB8ChFdh9us9H0=";
     };
 
-    dependencies = with python3Packages; [
+    dependencies = with py; [
       azure-identity
       jinja2
       litellm
@@ -153,7 +155,7 @@
     doCheck = false;
   };
 
-  graphrag-vectors = python3Packages.buildPythonPackage {
+  graphrag-vectors = py.buildPythonPackage {
     pname = "graphrag-vectors";
     inherit version;
     format = "wheel";
@@ -162,7 +164,7 @@
       hash = "sha256-i8URVyaMijU4UNnzjYrL71z0m6e9nZbffd00IjHo7ow=";
     };
 
-    dependencies = with python3Packages; [
+    dependencies = with py; [
       azure-core
       azure-cosmos
       azure-identity
@@ -179,7 +181,7 @@
     doCheck = false;
   };
 in
-  python3Packages.buildPythonApplication {
+  py.buildPythonApplication {
     pname = "graphrag";
     inherit version;
     format = "wheel";
@@ -188,7 +190,7 @@ in
       hash = "sha256-0u6Hs28MGtv4QWYNvc9KTEPj9CS3dBmqOJWzlheYpZQ=";
     };
 
-    dependencies = with python3Packages; [
+    dependencies = with py; [
       azure-identity
       azure-search-documents
       azure-storage-blob
@@ -220,7 +222,7 @@ in
     pythonRelaxDeps = true;
     pythonImportsCheck = ["graphrag"];
 
-    nativeCheckInputs = with python3Packages; [
+    nativeCheckInputs = with py; [
       pytestCheckHook
     ];
 

@@ -46,41 +46,41 @@
 
     services.resolved.enable = true;
 
-    sops.secrets."networkmanager/wifi_profile" = {
-      mode = "0400";
-      restartUnits = ["networkmanager-static-wifi.service"];
-    };
+    # sops.secrets."networkmanager/wifi_profile" = {
+    #   mode = "0400";
+    #   restartUnits = ["networkmanager-static-wifi.service"];
+    # };
 
-    systemd.services.networkmanager-static-wifi = {
-      description = "Apply static IPv4 settings to the Wi-Fi profile";
-      wantedBy = ["multi-user.target" "network-online.target"];
-      before = ["network-online.target"];
-      after = ["NetworkManager.service" "sops-install-secrets.service"];
-      requires = ["NetworkManager.service" "sops-install-secrets.service"];
-      path = [pkgs.coreutils pkgs.networkmanager];
+    # systemd.services.networkmanager-static-wifi = {
+    #   description = "Apply static IPv4 settings to the Wi-Fi profile";
+    #   wantedBy = ["multi-user.target" "network-online.target"];
+    #   before = ["network-online.target"];
+    #   after = ["NetworkManager.service" "sops-install-secrets.service"];
+    #   requires = ["NetworkManager.service" "sops-install-secrets.service"];
+    #   path = [pkgs.coreutils pkgs.networkmanager];
 
-      serviceConfig = {
-        Type = "oneshot";
-        RemainAfterExit = true;
-      };
+    #   serviceConfig = {
+    #     Type = "oneshot";
+    #     RemainAfterExit = true;
+    #   };
 
-      script = ''
-        wifi_profile="$(tr -d '\r\n' < ${config.sops.secrets."networkmanager/wifi_profile".path})"
+    #   script = ''
+    #     wifi_profile="$(tr -d '\r\n' < ${config.sops.secrets."networkmanager/wifi_profile".path})"
 
-        if ! nmcli connection modify "$wifi_profile" \
-          connection.autoconnect yes \
-          connection.interface-name "${config.marco.wifi.interface}" \
-          ipv4.method manual \
-          ipv4.addresses "${config.marco.wifi.staticAddress}" \
-          ipv4.gateway "${config.marco.wifi.gateway}" \
-          ipv4.dns "${config.marco.wifi.dns}" \
-          ipv6.method auto; then
-          echo "failed to configure NetworkManager Wi-Fi profile" >&2
-          exit 1
-        fi
+    #     if ! nmcli connection modify "$wifi_profile" \
+    #       connection.autoconnect yes \
+    #       connection.interface-name "${config.marco.wifi.interface}" \
+    #       ipv4.method manual \
+    #       ipv4.addresses "${config.marco.wifi.staticAddress}" \
+    #       ipv4.gateway "${config.marco.wifi.gateway}" \
+    #       ipv4.dns "${config.marco.wifi.dns}" \
+    #       ipv6.method auto; then
+    #       echo "failed to configure NetworkManager Wi-Fi profile" >&2
+    #       exit 1
+    #     fi
 
-        nmcli device reapply "${config.marco.wifi.interface}" || true
-      '';
-    };
+    #     nmcli device reapply "${config.marco.wifi.interface}" || true
+    #   '';
+    # };
   };
 }
