@@ -2,7 +2,9 @@
 {...}: {
   imports = [
     ./claude
+    ./codex
     ./copilot
+    ./graphrag.nix
 
     ./mcp.nix
   ];
