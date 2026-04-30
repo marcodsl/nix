@@ -1,0 +1,218 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/install-nix
+      - name: Check formatting
+        run: nix fmt -- --check flake.nix configurations/ modules/ packages/
+
+  check:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/install-nix
+      - name: Check flake
+        run: nix flake check --no-pure-eval
+
+  dependency-review:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+      - name: Check for vulnerable dependencies
+        uses: actions/dependency-review-action@2031cfc080254a8a887f58cffee85186f0e49e48 # v4.9.0
+        with:
+          fail-on-severity: high
+          comment-summary-in-pr: always
+
+  semgrep:
+    needs: [lint, check]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    container:
+      image: semgrep/semgrep
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+      - name: Run Semgrep
+        run: semgrep ci --sarif --output=semgrep-results.sarif
+        env:
+          SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
+      - name: Upload Semgrep SARIF results
+        if: always()
+        uses: github/codeql-action/upload-sarif@65216971a11ded447a6b76263d5a144519e5eee1 # codeql-bundle-v2.25.2
+        with:
+          sarif_file: semgrep-results.sarif
+
+  trivy:
+    needs: [lint, check]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+      - name: Run Trivy vulnerability scan
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          severity: HIGH,CRITICAL
+          exit-code: "1"
+          format: table
+      - name: Upload Trivy SARIF results
+        if: always()
+        uses: github/codeql-action/upload-sarif@65216971a11ded447a6b76263d5a144519e5eee1 # codeql-bundle-v2.25.2
+        with:
+          sarif_file: trivy-results.sarif
+
+  build-packages:
+    needs: [lint, check, trivy, semgrep]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Clean up disk space
+        if: runner.os == 'Linux'
+        run: |
+          echo "::group::Disk usage before cleanup"
+          df -h /
+          echo "::endgroup::"
+
+          echo "::group::Cleaning up large directories"
+          sudo rm -rf /usr/lib/jvm
+          sudo rm -rf /usr/local/.ghcup
+          sudo rm -rf /usr/local/lib/android
+          sudo rm -rf /usr/local/share/powershell
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /usr/share/swift
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+          echo "::endgroup::"
+
+          echo "::group::Disk usage after cleanup"
+          df -h /
+          echo "::endgroup::"
+
+      - name: Disable AppArmor unprivileged user namespace restriction
+        run: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
+      - uses: ./.github/actions/install-nix
+
+      - name: Build packages
+        shell: bash
+        run: |
+          set -euo pipefail
+          for pkg in burp-suite-pro codex context-mode graphrag; do
+            echo "::group::Build ${pkg}"
+            nix build ".#${pkg}" --no-pure-eval
+            echo "::endgroup::"
+          done
+
+  build-system-closures:
+    needs: [lint, check, trivy, semgrep]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Clean up disk space
+        if: runner.os == 'Linux'
+        run: |
+          echo "::group::Disk usage before cleanup"
+          df -h /
+          echo "::endgroup::"
+
+          echo "::group::Cleaning up large directories"
+          sudo rm -rf /usr/lib/jvm
+          sudo rm -rf /usr/local/.ghcup
+          sudo rm -rf /usr/local/lib/android
+          sudo rm -rf /usr/local/share/powershell
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /usr/share/swift
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+          echo "::endgroup::"
+
+          echo "::group::Disk usage after cleanup"
+          df -h /
+          echo "::endgroup::"
+
+      - name: Disable AppArmor unprivileged user namespace restriction
+        run: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
+      - uses: ./.github/actions/install-nix
+
+      - name: Build NixOS system closures
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          mapfile -t hosts < <(
+            find configurations/nixos -mindepth 1 -maxdepth 1 \( -type d -o -name '*.nix' \) -printf '%f\n' \
+              | sed 's/\.nix$//' \
+              | sort -u
+          )
+
+          if [ "${#hosts[@]}" -eq 0 ]; then
+            echo "No NixOS hosts found under configurations/nixos" >&2
+            exit 1
+          fi
+
+          printf 'Discovered NixOS hosts: %s\n' "${hosts[*]}"
+
+          for host in "${hosts[@]}"; do
+            echo "::group::Build system closure for ${host}"
+            nix build ".#nixosConfigurations.${host}.config.system.build.toplevel" --no-pure-eval
+            echo "::endgroup::"
+          done
+
+  build-activate:
+    needs: [lint, check, trivy, semgrep]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/install-nix
+      - name: Build activate launcher
+        run: nix build .#activate --no-pure-eval
