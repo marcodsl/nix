@@ -26,7 +26,6 @@ in {
       recursive = true;
     };
 
-
     ".copilot/mcp-config.json".text = builtins.toJSON {
       mcpServers = copilotMcpServers;
     };
