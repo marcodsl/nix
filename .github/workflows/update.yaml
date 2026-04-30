@@ -55,7 +55,9 @@ jobs:
       - uses: ./.github/actions/install-nix
 
       - name: Run ${{ matrix.package }} update script
-        run: nix-shell -i rust-script ${{ matrix.script }}
+        run: |
+          chmod +x "${{ matrix.script }}"
+          ./${{ matrix.script }}
 
       - name: Upload ${{ matrix.package }} changes
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
