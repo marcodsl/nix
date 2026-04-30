@@ -78,7 +78,6 @@
       chisel
       exploitdb
       metasploit
-      netexec
       responder
       hashcat
       john
