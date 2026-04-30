@@ -1,55 +1,50 @@
 # Context-mode operating rules
 
-Use this file for the detailed context-mode workflow. The top-level `copilot-instructions.md` contains the routing-critical rules that take precedence.
+Use this file for detailed context-mode workflow. The top-level `copilot-instructions.md` owns routing-critical rules.
 
 ## Think in code
 
-When you need to analyze, count, filter, compare, search, parse, transform, or process data, write code that does the work with `ctx_execute(language, code)` and print only the answer with `console.log()`.
+When you need to analyze, count, filter, compare, parse, transform, or process data, use `ctx_execute(language, code)` and print only the answer.
 
-- Do not read large raw outputs into context to process mentally.
-- Prefer robust, pure JavaScript with no npm dependencies.
-- Use only Node.js built-ins such as `fs`, `path`, and `child_process`.
-- Always use `try/catch`, handle `null` and `undefined`, and keep code compatible with both Node.js and Bun.
+- Do not read large raw outputs into context for mental processing.
+- Prefer robust JavaScript with Node.js built-ins (`fs`, `path`, `child_process`) and no npm dependencies.
+- Use `try/catch`, handle `null`/`undefined`, and keep code compatible with Node.js and Bun.
 
 ## Blocked commands
 
-Do not attempt these paths and do not retry them in the terminal:
+Do not attempt or retry these in the terminal:
 
-- `curl` or `wget`: use `ctx_fetch_and_index(url, source)` for web content or `ctx_execute(language: "javascript", code: "const r = await fetch(...)")` for sandboxed HTTP.
-- Inline HTTP from terminal code such as `fetch('http`, `requests.get(`, `requests.post(`, `http.get(`, or `http.request(`: use `ctx_execute(language, code)` instead.
-- Direct web fetching tools: use `ctx_fetch_and_index(url, source)` and then `ctx_search(queries)`.
+- `curl` or `wget`: use `ctx_fetch_and_index(url, source)` for web content, or sandboxed fetch inside `ctx_execute`.
+- Inline terminal HTTP (`fetch('http`, `requests.get/post`, `http.get/request`): use `ctx_execute` instead.
+- Direct web fetching tools: use `ctx_fetch_and_index` then `ctx_search`.
 
 ## Redirected tools
 
-Use sandbox equivalents when exploration or analysis could produce large output.
+- Use terminal or `run_in_terminal` for short-output shell work: `git`, `mkdir`, `rm`, `mv`, `cd`, `ls`, installs, and similarly bounded commands.
+- For larger exploration or analysis, use `ctx_batch_execute`, `ctx_execute(language: "shell", code: "...")`, or `ctx_execute_file`.
+- Read files directly only when their contents must be in context for editing. For analysis or summarization, use `ctx_execute_file` and print a summary.
+- For searches that could produce many matches, run a sandboxed search and print only the needed summary.
 
-- Use terminal or `run_in_terminal` only for `git`, `mkdir`, `rm`, `mv`, `cd`, `ls`, `npm install`, `pip install`, and other short-output commands.
-- For other command execution, prefer `ctx_batch_execute(commands, queries)` or `ctx_execute(language: "shell", code: "...")`.
-- Read files directly only when you need file contents in context to edit them. For analysis, exploration, or summarization, prefer `ctx_execute_file(path, language, code)` so only your summary enters context.
-- For searches that could return many matches, prefer sandbox execution and print only the summary you need.
+## Tool hierarchy
 
-## Tool selection hierarchy
-
-1. **Gather** with `ctx_batch_execute(commands, queries)` as the primary tool. Use descriptive command labels because they become searchable chunk titles.
-2. **Follow up** with `ctx_search(queries: ["q1", "q2", ...])`, passing all related questions in one call.
-3. **Process** with `ctx_execute(language, code)` or `ctx_execute_file(path, language, code)` so only stdout enters context.
-4. **Fetch web content** with `ctx_fetch_and_index(url, source)` and then query it with `ctx_search(queries)`.
-5. **Index reusable content** with `ctx_index(content, source)` using descriptive source labels.
+1. Gather with `ctx_batch_execute(commands, queries)` and descriptive command labels.
+2. Follow up with batched `ctx_search(queries)`.
+3. Process with `ctx_execute` or `ctx_execute_file` so only stdout enters context.
+4. Fetch web content with `ctx_fetch_and_index` and query with `ctx_search`.
+5. Index reusable content with `ctx_index(content, source)` and descriptive labels.
 
 ## Output constraints
 
 - Keep responses under 500 words.
 - Write substantial artifacts such as code, configs, and PRDs to files instead of returning them inline.
-- When you create an artifact file, return only the file path and a one-line description.
-- When indexing content, use descriptive source labels so later searches can target that source precisely.
+- When creating an artifact file, return only the file path and one-line description.
+- Use descriptive source labels when indexing content.
 
 ## ctx commands
 
-| Command       | Action                                                                                                  |
-| ------------- | ------------------------------------------------------------------------------------------------------- |
-| `ctx stats`   | Call the `ctx_stats` MCP tool and display the full output verbatim.                                     |
-| `ctx doctor`  | Call the `ctx_doctor` MCP tool, run the returned shell command, and display the result as a checklist.  |
-| `ctx upgrade` | Call the `ctx_upgrade` MCP tool, run the returned shell command, and display the result as a checklist. |
-| `ctx purge`   | Call the `ctx_purge` MCP tool with `confirm: true`. Warn before wiping the knowledge base.              |
+- `ctx stats`: call `ctx_stats` and show full output verbatim.
+- `ctx doctor`: call `ctx_doctor`, run the returned shell command, show result as a checklist.
+- `ctx upgrade`: call `ctx_upgrade`, run the returned shell command, show result as a checklist.
+- `ctx purge`: call `ctx_purge` with `confirm: true`; warn before wiping the knowledge base.
 
-After `/clear` or `/compact`, knowledge base contents and session stats remain available. Use `ctx purge` when you need a fresh start.
+After `/clear` or `/compact`, knowledge base contents and stats remain available. Use `ctx purge` only for a fresh start.

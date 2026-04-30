@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   workflow_run:
     workflows:
-      - secret-scan
+      - ci
     types:
       - completed
     branches:
@@ -48,9 +48,9 @@ jobs:
       - name: Disable AppArmor unprivileged user namespace restriction
         run: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
 
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
-          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+          persist-credentials: false
 
       - uses: ./.github/actions/install-nix
         with:

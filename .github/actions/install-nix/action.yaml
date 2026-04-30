@@ -21,19 +21,19 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - uses: cachix/install-nix-action@v31
+    - uses: cachix/install-nix-action@ab739621df7a23f52766f9ccc97f38da6b7af14f # v31.10.5
       with:
         nix_path: ${{ inputs.nix_path }}
         extra_nix_config: ${{ inputs.extra_nix_config }}
 
     - if: ${{ inputs.auth_token == '' }}
-      uses: cachix/cachix-action@v17
+      uses: cachix/cachix-action@1eb2ef646ac0255473d23a5907ad7b04ce94065c # v17
       with:
         name: marcodsl
         extraPullNames: cachix,devenv,nix-community
 
     - if: ${{ inputs.auth_token != '' }}
-      uses: cachix/cachix-action@v17
+      uses: cachix/cachix-action@1eb2ef646ac0255473d23a5907ad7b04ce94065c # v17
       with:
         name: marcodsl
         authToken: ${{ inputs.auth_token }}

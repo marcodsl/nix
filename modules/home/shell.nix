@@ -8,9 +8,9 @@
     bash = {
       # on macOS, we probably don't need this
       enable = pkgs.stdenv.hostPlatform.isLinux;
-      initExtra = ''
-        # Custom bash profile goes here
-      '';
+      # initExtra = ''
+      #   # Custom bash profile goes here
+      # '';
     };
 
     # For macOS's default shell.
@@ -27,9 +27,9 @@
         docker = "podman";
       };
 
-      envExtra = ''
-        # Custom ~/.zshenv goes here
-      '';
+      # envExtra = ''
+      #   # Custom ~/.zshenv goes here
+      # '';
 
       profileExtra = let
         paths = lib.concatStringsSep ":" [
@@ -41,13 +41,13 @@
         export PATH="${paths}:$PATH"
       '';
 
-      loginExtra = ''
-        # Custom ~/.zlogin goes here
-      '';
+      # loginExtra = ''
+      #   # Custom ~/.zlogin goes here
+      # '';
 
-      logoutExtra = ''
-        # Custom ~/.zlogout goes here
-      '';
+      # logoutExtra = ''
+      #   # Custom ~/.zlogout goes here
+      # '';
 
       dotDir = "${config.xdg.configHome}/zsh";
     };

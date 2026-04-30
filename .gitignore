@@ -13,8 +13,9 @@ devenv.local.yaml
 packages/burp-suite-pro/*
 !packages/burp-suite-pro/.gitkeep
 
-# Copilot learning database
+# AI tools
 .copilot-memory/
+.codex
 
 # Python bytecode caches
 __pycache__/

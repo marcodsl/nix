@@ -32,7 +32,6 @@
       vulnix
 
       # Reverse engineering & forensics
-      cutter
       detect-it-easy
       flare-floss
       ghidra
@@ -78,7 +77,6 @@
       chisel
       exploitdb
       metasploit
-      netexec
       responder
       hashcat
       john

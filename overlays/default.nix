@@ -12,5 +12,18 @@ in
         else name;
       value = self.callPackage (packages + "/${name}") {};
     };
+    localPackages = builtins.listToAttrs (builtins.attrValues (builtins.mapAttrs toPackage entries));
   in
-    builtins.listToAttrs (builtins.attrValues (builtins.mapAttrs toPackage entries))
+    localPackages
+    // {
+      pythonPackagesExtensions =
+        (super.pythonPackagesExtensions or [])
+        ++ [
+          (_final: prev: {
+            fastmcp = prev.fastmcp.overridePythonAttrs (_old: {
+              # fastmcp sampling tests can hang in sandboxed pytestCheckPhase.
+              doCheck = false;
+            });
+          })
+        ];
+    }

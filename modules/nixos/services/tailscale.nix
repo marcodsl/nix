@@ -11,6 +11,7 @@ in {
     services.tailscale = {
       enable = true;
       permitCertUid = "caddy";
+      extraSetFlags = ["--accept-dns=false"];
     };
 
     systemd.services.tailscaled.after = ["nftables.service"];
