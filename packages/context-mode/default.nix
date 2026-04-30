@@ -6,7 +6,7 @@
   nodejs_24,
 }: let
   pname = "context-mode";
-  version = "1.0.94";
+  version = "1.0.103";
 
   mkNpmTarball = {
     url,
@@ -15,13 +15,13 @@
     fetchurl {inherit url hash;};
 
   contextModeTarball = mkNpmTarball {
-    url = "https://registry.npmjs.org/context-mode/-/context-mode-${version}.tgz";
-    hash = "sha256-WyLPIfEmS742M2ZVzrJmRh9uTZg/5nMPztI9Tm97Jr0=";
+    url = "https://registry.npmjs.org/context-mode/-/context-mode-1.0.103.tgz";
+    hash = "sha256-/oKIXsc2YL8uxhp6G9pK4+Jj5jzmjkP04/S/Y3ER1hU=";
   };
 
   turndownTarball = mkNpmTarball {
-    url = "https://registry.npmjs.org/turndown/-/turndown-7.2.0.tgz";
-    hash = "sha256-jWcuLDuXNZfZOQqVEmyoqm18imBz1X5xJEQheKJXlqY=";
+    url = "https://registry.npmjs.org/turndown/-/turndown-7.2.4.tgz";
+    hash = "sha256-BfYbw/Cuyl5c1/G1SS4muQQLsAcIzUH7Gw97IW4pb6A=";
   };
 
   turndownPluginGfmTarball = mkNpmTarball {

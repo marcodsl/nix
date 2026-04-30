@@ -69,8 +69,8 @@ fn latest_npm_version(package_name: &str) -> Result<String, String> {
 }
 
 fn npm_tarball_url(package_name: &str, version: &str) -> String {
-    let escaped = package_name.replace('/', "%2F");
-    format!("{NPM_REGISTRY}/{package_name}/-/{escaped}-{version}.tgz")
+    let tarball_name = package_name.rsplit('/').next().unwrap_or(package_name);
+    format!("{NPM_REGISTRY}/{package_name}/-/{tarball_name}-{version}.tgz")
 }
 
 fn fetch(url: &str) -> Result<String, String> {
@@ -110,15 +110,47 @@ fn prefetch(url: &str) -> Result<String, String> {
         return Err(format!("nix-prefetch-url returned an empty hash for {url}"));
     }
 
-    Ok(normalize_sha256_hash(hash))
+    normalize_sha256_hash(hash)
 }
 
-/// Removes an existing SRI sha256 prefix so callers can add one consistently.
-fn normalize_sha256_hash(mut hash: String) -> String {
-    if hash.starts_with("sha256-") {
-        hash.drain(0..7);
+fn normalize_sha256_hash(hash: String) -> Result<String, String> {
+    let trimmed = hash.trim();
+    let sri_hash = if trimmed.starts_with("sha256-") {
+        trimmed.to_string()
+    } else {
+        convert_sha256_to_sri(trimmed)?
+    };
+
+    sri_hash
+        .strip_prefix("sha256-")
+        .map(str::to_string)
+        .ok_or_else(|| format!("converted hash is not a sha256 SRI hash: {sri_hash}"))
+}
+
+fn convert_sha256_to_sri(hash: &str) -> Result<String, String> {
+    let output = Command::new("nix")
+        .args([
+            "hash",
+            "convert",
+            "--hash-algo",
+            "sha256",
+            "--to",
+            "sri",
+            hash,
+        ])
+        .output()
+        .map_err(|error| format!("failed to run nix hash convert for {hash}: {error}"))?;
+
+    if !output.status.success() {
+        return Err(format!(
+            "nix hash convert failed for {hash}: {}",
+            String::from_utf8_lossy(&output.stderr).trim()
+        ));
     }
-    hash
+
+    String::from_utf8(output.stdout)
+        .map(|stdout| stdout.trim().to_string())
+        .map_err(|error| format!("nix hash convert returned invalid UTF-8 for {hash}: {error}"))
 }
 
 fn json_string(json: &str, key: &str) -> Option<String> {
