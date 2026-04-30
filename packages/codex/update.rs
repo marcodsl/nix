@@ -17,8 +17,8 @@ const NPM_LATEST: &str = "https://registry.npmjs.org/@openai/codex/latest";
 const NATIVE_PLATFORMS: [&str; 4] = [
     "aarch64-apple-darwin",
     "x86_64-apple-darwin",
-    "x86_64-unknown-linux-gnu",
-    "aarch64-unknown-linux-gnu",
+    "x86_64-unknown-linux-musl",
+    "aarch64-unknown-linux-musl",
 ];
 
 const NODE_PLATFORMS: [&str; 4] = ["darwin-arm64", "darwin-x64", "linux-x64", "linux-arm64"];
