@@ -55,8 +55,8 @@
       description = "Apply static IPv4 settings to the Wi-Fi profile";
       wantedBy = ["multi-user.target" "network-online.target"];
       before = ["network-online.target"];
-      after = ["NetworkManager.service" "sops-install-secrets.service"];
-      requires = ["NetworkManager.service" "sops-install-secrets.service"];
+      after = ["NetworkManager.service"];
+      requires = ["NetworkManager.service"];
       path = [pkgs.coreutils pkgs.networkmanager];
 
       serviceConfig = {
