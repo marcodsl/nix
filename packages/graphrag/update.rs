@@ -104,19 +104,16 @@ fn fetch_wheel_info(package_name: &str, version: &str) -> Result<WheelInfo, Stri
 }
 
 fn find_wheel_url(json: &str, package_name: &str, version: &str) -> Result<String, String> {
-    let filename_fragment = format!(
-        "\"filename\": \"{}-{}-py3-none-any.whl\"",
+    let wheel_filename = format!(
+        "{}-{}-py3-none-any.whl",
         package_name.replace('-', "_"),
         version
     );
+    let filename_value = format!("\"{wheel_filename}\"");
 
-    if let Some(idx) = json.find(&filename_fragment) {
-        let before = &json[..idx];
-        if let Some(url_start) = before.rfind("\"url\": \"") {
-            let after_url = &json[url_start + 8..];
-            if let Some(url_end) = after_url.find('"') {
-                return Ok(after_url[..url_end].to_string());
-            }
+    if let Some(filename_idx) = json.find(&filename_value) {
+        if let Some(url) = json_string_from(json, filename_idx, "url") {
+            return Ok(url);
         }
     }
 
@@ -161,20 +158,56 @@ fn prefetch(url: &str) -> Result<String, String> {
         return Err(format!("nix-prefetch-url returned an empty hash for {url}"));
     }
 
-    Ok(normalize_sha256_hash(hash))
+    normalize_sha256_hash(hash)
 }
 
-/// Removes an existing SRI sha256 prefix so callers can add one consistently.
-fn normalize_sha256_hash(mut hash: String) -> String {
-    if hash.starts_with("sha256-") {
-        hash.drain(0..7);
+fn normalize_sha256_hash(hash: String) -> Result<String, String> {
+    let trimmed = hash.trim();
+    let sri_hash = if trimmed.starts_with("sha256-") {
+        trimmed.to_string()
+    } else {
+        convert_sha256_to_sri(trimmed)?
+    };
+
+    sri_hash
+        .strip_prefix("sha256-")
+        .map(str::to_string)
+        .ok_or_else(|| format!("converted hash is not a sha256 SRI hash: {sri_hash}"))
+}
+
+fn convert_sha256_to_sri(hash: &str) -> Result<String, String> {
+    let output = Command::new("nix")
+        .args([
+            "hash",
+            "convert",
+            "--hash-algo",
+            "sha256",
+            "--to",
+            "sri",
+            hash,
+        ])
+        .output()
+        .map_err(|error| format!("failed to run nix hash convert for {hash}: {error}"))?;
+
+    if !output.status.success() {
+        return Err(format!(
+            "nix hash convert failed for {hash}: {}",
+            String::from_utf8_lossy(&output.stderr).trim()
+        ));
     }
-    hash
+
+    String::from_utf8(output.stdout)
+        .map(|stdout| stdout.trim().to_string())
+        .map_err(|error| format!("nix hash convert returned invalid UTF-8 for {hash}: {error}"))
 }
 
 fn json_string(json: &str, key: &str) -> Option<String> {
+    json_string_from(json, 0, key)
+}
+
+fn json_string_from(json: &str, start: usize, key: &str) -> Option<String> {
     let needle = format!("\"{key}\"");
-    let key_start = json.find(&needle)?;
+    let key_start = json[start..].find(&needle)? + start;
     let after_key = &json[key_start + needle.len()..];
     let colon = after_key.find(':')?;
     let after_colon = after_key[colon + 1..].trim_start();
@@ -241,7 +274,9 @@ fn update_default_nix(
             current_section = "graphrag_llm".to_string();
         } else if trimmed.starts_with("graphrag-vectors = ") {
             current_section = "graphrag_vectors".to_string();
-        } else if trimmed.starts_with("python3Packages.buildPythonApplication") {
+        } else if trimmed.starts_with("python3Packages.buildPythonApplication")
+            || trimmed.starts_with("py.buildPythonApplication")
+        {
             current_section = "graphrag".to_string();
         }
 
