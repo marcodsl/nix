@@ -139,7 +139,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          for pkg in burp-suite-pro codex context-mode graphrag; do
+          for pkg in codex context-mode graphrag; do
             echo "::group::Build ${pkg}"
             nix build ".#${pkg}" --no-pure-eval
             echo "::endgroup::"
