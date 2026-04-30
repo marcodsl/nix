@@ -91,7 +91,8 @@ jobs:
           scan-ref: .
           severity: HIGH,CRITICAL
           exit-code: "1"
-          format: table
+          format: sarif
+          output: trivy-results.sarif
       - name: Upload Trivy SARIF results
         if: always()
         uses: github/codeql-action/upload-sarif@65216971a11ded447a6b76263d5a144519e5eee1 # codeql-bundle-v2.25.2

@@ -111,7 +111,11 @@ fn prefetch(url: &str) -> Result<String, String> {
         return Err(format!("nix-prefetch-url returned an empty hash for {url}"));
     }
 
-    Ok(hash)
+    Ok(normalize_sha256_hash(&hash).to_string())
+}
+
+fn normalize_sha256_hash(hash: &str) -> &str {
+    hash.strip_prefix("sha256-").unwrap_or(hash)
 }
 
 fn json_string(json: &str, key: &str) -> Option<String> {
@@ -189,39 +193,43 @@ fn update_default_nix(
         // Replace URL lines
         if trimmed.starts_with("url = \"https://registry.npmjs.org/") {
             let indent: String = line.chars().take_while(|c| c.is_whitespace()).collect();
-            let new_url = match current_dep {
-                Some("context-mode") => npm_tarball_url("context-mode", version),
+            if let Some(new_url) = match current_dep {
+                Some("context-mode") => Some(npm_tarball_url("context-mode", version)),
                 Some(dep) => {
-                    if let Some((_, dep_ver, _)) = dep_hashes.iter().find(|(name, _, _)| name == dep) {
-                        npm_tarball_url(dep, dep_ver)
+                    if let Some((_, dep_ver, _)) =
+                        dep_hashes.iter().find(|(name, _, _)| name == dep)
+                    {
+                        Some(npm_tarball_url(dep, dep_ver))
                     } else {
-                        line.to_string()
+                        None
                     }
                 }
-                None => line.to_string(),
-            };
-            output.push_str(&format!("{indent}url = \"{new_url}\";"));
-            output.push('\n');
-            continue;
+                None => None,
+            } {
+                output.push_str(&format!("{indent}url = \"{new_url}\";"));
+                output.push('\n');
+                continue;
+            }
         }
 
         // Replace hash lines
         if trimmed.starts_with("hash = \"sha256-") {
             let indent: String = line.chars().take_while(|c| c.is_whitespace()).collect();
-            let new_hash = match current_dep {
-                Some("context-mode") => context_mode_hash.to_string(),
+            if let Some(new_hash) = match current_dep {
+                Some("context-mode") => Some(context_mode_hash.to_string()),
                 Some(dep) => {
                     if let Some((_, _, hash)) = dep_hashes.iter().find(|(name, _, _)| name == dep) {
-                        hash.clone()
+                        Some(hash.clone())
                     } else {
-                        line.to_string()
+                        None
                     }
                 }
-                None => line.to_string(),
-            };
-            output.push_str(&format!("{indent}hash = \"sha256-{new_hash}\";"));
-            output.push('\n');
-            continue;
+                None => None,
+            } {
+                output.push_str(&format!("{indent}hash = \"sha256-{new_hash}\";"));
+                output.push('\n');
+                continue;
+            }
         }
 
         output.push_str(line);

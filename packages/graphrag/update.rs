@@ -161,7 +161,11 @@ fn prefetch(url: &str) -> Result<String, String> {
         return Err(format!("nix-prefetch-url returned an empty hash for {url}"));
     }
 
-    Ok(hash)
+    Ok(normalize_sha256_hash(&hash).to_string())
+}
+
+fn normalize_sha256_hash(hash: &str) -> &str {
+    hash.strip_prefix("sha256-").unwrap_or(hash)
 }
 
 fn json_string(json: &str, key: &str) -> Option<String> {
@@ -213,6 +217,7 @@ fn update_default_nix(
 ) -> Result<String, String> {
     let mut output = String::new();
     let mut current_section = String::new();
+    let mut version_replaced = false;
 
     for line in input.lines() {
         let trimmed = line.trim();
@@ -237,41 +242,48 @@ fn update_default_nix(
         }
 
         // Replace version
-        if trimmed.starts_with("version = \"") {
+        if !version_replaced && trimmed.starts_with("version = \"") {
             let indent: String = line.chars().take_while(|c| c.is_whitespace()).collect();
             output.push_str(&format!("{indent}version = \"{version}\";"));
             output.push('\n');
+            version_replaced = true;
             continue;
         }
 
         // Replace URL lines
         if trimmed.starts_with("url = \"https://files.pythonhosted.org/") {
             let indent: String = line.chars().take_while(|c| c.is_whitespace()).collect();
-            let new_url = if current_section == "graphrag" {
-                &graphrag_info.url
-            } else if let Some((_, info)) = sub_infos.iter().find(|(name, _)| *name == current_section) {
-                &info.url
+            if let Some(new_url) = if current_section == "graphrag" {
+                Some(&graphrag_info.url)
+            } else if let Some((_, info)) =
+                sub_infos.iter().find(|(name, _)| *name == current_section)
+            {
+                Some(&info.url)
             } else {
-                line
-            };
-            output.push_str(&format!("{indent}url = \"{new_url}\";"));
-            output.push('\n');
-            continue;
+                None
+            } {
+                output.push_str(&format!("{indent}url = \"{new_url}\";"));
+                output.push('\n');
+                continue;
+            }
         }
 
         // Replace hash lines
         if trimmed.starts_with("hash = \"sha256-") {
             let indent: String = line.chars().take_while(|c| c.is_whitespace()).collect();
-            let new_hash = if current_section == "graphrag" {
-                &graphrag_info.hash
-            } else if let Some((_, info)) = sub_infos.iter().find(|(name, _)| *name == current_section) {
-                &info.hash
+            if let Some(new_hash) = if current_section == "graphrag" {
+                Some(&graphrag_info.hash)
+            } else if let Some((_, info)) =
+                sub_infos.iter().find(|(name, _)| *name == current_section)
+            {
+                Some(&info.hash)
             } else {
-                line
-            };
-            output.push_str(&format!("{indent}hash = \"sha256-{new_hash}\";"));
-            output.push('\n');
-            continue;
+                None
+            } {
+                output.push_str(&format!("{indent}hash = \"sha256-{new_hash}\";"));
+                output.push('\n');
+                continue;
+            }
         }
 
         output.push_str(line);
