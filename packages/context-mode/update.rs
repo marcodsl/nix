@@ -114,6 +114,7 @@ fn prefetch(url: &str) -> Result<String, String> {
     Ok(normalize_sha256_hash(&hash).to_string())
 }
 
+/// Removes an existing SRI sha256 prefix so callers can add one consistently.
 fn normalize_sha256_hash(hash: &str) -> &str {
     hash.strip_prefix("sha256-").unwrap_or(hash)
 }

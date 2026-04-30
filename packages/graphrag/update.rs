@@ -164,6 +164,7 @@ fn prefetch(url: &str) -> Result<String, String> {
     Ok(normalize_sha256_hash(&hash).to_string())
 }
 
+/// Removes an existing SRI sha256 prefix so callers can add one consistently.
 fn normalize_sha256_hash(hash: &str) -> &str {
     hash.strip_prefix("sha256-").unwrap_or(hash)
 }
@@ -241,7 +242,7 @@ fn update_default_nix(
             current_section = "graphrag".to_string();
         }
 
-        // Replace version
+        // Only replace the top-level version; dependencies may have their own pins.
         if !version_replaced && trimmed.starts_with("version = \"") {
             let indent: String = line.chars().take_while(|c| c.is_whitespace()).collect();
             output.push_str(&format!("{indent}version = \"{version}\";"));
