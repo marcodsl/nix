@@ -1,24 +1,14 @@
-name: cachix-publish
+name: Publish to Cachix
 
 on:
   workflow_dispatch:
-  workflow_run:
-    workflows:
-      - ci
-    types:
-      - completed
-    branches:
-      - main
 
 concurrency:
-  group: cachix-publish-${{ github.event.workflow_run.head_sha || github.sha }}
+  group: cachix-${{ github.sha }}
   cancel-in-progress: false
 
 jobs:
   publish:
-    if: >-
-      github.event_name == 'workflow_dispatch' ||
-      github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     environment: canonical
     permissions:
@@ -50,7 +40,7 @@ jobs:
 
           if [ "${#hosts[@]}" -eq 0 ]; then
             echo "No NixOS hosts found under configurations/nixos" >&2
-            exit 1
+            exit 0
           fi
 
           printf 'Discovered NixOS hosts: %s\n' "${hosts[*]}"

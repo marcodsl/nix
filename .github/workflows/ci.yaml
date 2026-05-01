@@ -1,10 +1,18 @@
-name: ci
+name: CI
 
 on:
   pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - synchronize
+      - reopened
+
   push:
     branches:
       - main
+
   workflow_dispatch:
 
 concurrency:
@@ -13,6 +21,7 @@ concurrency:
 
 jobs:
   lint:
+    name: Lint
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -25,9 +34,12 @@ jobs:
         run: nix fmt -- --check flake.nix configurations/ modules/ packages/
 
   check:
+    name: Check flake
     runs-on: ubuntu-latest
+
     permissions:
       contents: read
+
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
@@ -37,11 +49,14 @@ jobs:
         run: nix flake check --no-pure-eval
 
   dependency-review:
+    name: Check for vulnerable dependencies
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
+
     permissions:
       contents: read
       pull-requests: write
+
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
@@ -53,10 +68,13 @@ jobs:
           comment-summary-in-pr: always
 
   semgrep:
+    name: Semgrep security scan
     runs-on: ubuntu-latest
+
     permissions:
       contents: read
       security-events: write
+
     container:
       image: semgrep/semgrep
     steps:
@@ -74,10 +92,13 @@ jobs:
           sarif_file: semgrep-results.sarif
 
   trivy:
+    name: Trivy vulnerability scan
     runs-on: ubuntu-latest
+
     permissions:
       contents: read
       security-events: write
+
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
@@ -98,9 +119,12 @@ jobs:
           sarif_file: trivy-results.sarif
 
   gitleaks:
+    name: Gitleaks secret scan
     runs-on: ubuntu-latest
+
     permissions:
       contents: read
+
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
@@ -111,10 +135,13 @@ jobs:
           GITLEAKS_NOTIFY_USER_LIST: "@marcodsl"
 
   build-packages:
+    name: Build packages
     needs: [lint, check]
     runs-on: ubuntu-latest
+
     permissions:
       contents: read
+
     strategy:
       fail-fast: false
       matrix:
@@ -134,10 +161,13 @@ jobs:
         run: nix build ".#${{ matrix.package }}" --no-pure-eval
 
   discover-hosts:
+    name: Discover NixOS hosts
     needs: [lint, check]
     runs-on: ubuntu-latest
+
     permissions:
       contents: read
+
     outputs:
       hosts: ${{ steps.discover.outputs.hosts }}
     steps:
@@ -164,11 +194,14 @@ jobs:
           echo "hosts=$(printf '%s\n' "${hosts[@]}" | jq -R -s -c 'split("\n")[:-1]')" >> "$GITHUB_OUTPUT"
 
   build-system-closures:
+    name: Build system closures
     needs: [discover-hosts]
     if: needs.discover-hosts.outputs.hosts != '[]'
     runs-on: ubuntu-latest
+
     permissions:
       contents: read
+
     strategy:
       fail-fast: false
       matrix:
@@ -188,10 +221,13 @@ jobs:
         run: nix build ".#nixosConfigurations.${{ matrix.host }}.config.system.build.toplevel" --no-pure-eval
 
   build-activate:
+    name: Build activate launcher
     needs: [lint, check]
     runs-on: ubuntu-latest
+
     permissions:
       contents: read
+
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
