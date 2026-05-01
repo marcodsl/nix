@@ -1,6 +1,7 @@
 {...}: {
   imports = [
     ./direnv.nix
+    ./nh.nix
     ./nano.nix
   ];
 

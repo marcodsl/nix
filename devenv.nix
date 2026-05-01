@@ -8,6 +8,7 @@
     git
     just
     just-lsp
+    nh
     nil
     sops
     zip

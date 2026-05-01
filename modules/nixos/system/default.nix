@@ -4,7 +4,7 @@
     ./kernel.nix
     ./locales.nix
     ./networking.nix
-    ./security.nix
+    ./security
     ./systemd.nix
     ./virtualization.nix
   ];

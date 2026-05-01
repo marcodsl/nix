@@ -1,24 +1,8 @@
-{inputs, ...}: {
+{...}: {
   imports = [
-    inputs.nixos-unified.flakeModules.default
-    inputs.nixos-unified.flakeModules.autoWire
+    ./configurations.nix
+    ./flake-outputs.nix
+    ./module-sets.nix
+    ./packages.nix
   ];
-
-  perSystem = {
-    self',
-    pkgs,
-    system,
-    inputs',
-    ...
-  }: {
-    formatter = pkgs.alejandra;
-
-    packages.default = self'.packages.activate;
-
-    _module.args.pkgs = import inputs.nixpkgs {
-      inherit system;
-
-      config.allowUnfree = true;
-    };
-  };
 }

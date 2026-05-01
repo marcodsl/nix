@@ -23,8 +23,6 @@
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
     nix-mineral.url = "github:cynicsketch/nix-mineral/";
 
-    nixos-unified.url = "github:srid/nixos-unified";
-
     nix-index-database = {
       url = "github:nix-community/nix-index-database";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -49,11 +47,20 @@
     };
   };
 
-  # Wired using https://nixos-unified.org/autowiring.html
   outputs = inputs:
-    inputs.nixos-unified.lib.mkFlake
-    {
-      inherit inputs;
-      root = ./.;
+    inputs.flake-parts.lib.mkFlake {inherit inputs;} {
+      systems = [
+        "x86_64-linux"
+        "x86_64-darwin"
+        "aarch64-linux"
+        "aarch64-darwin"
+      ];
+
+      imports = [
+        ./modules/flake/activate-home.nix
+        ./modules/flake/devshell.nix
+        ./modules/flake/neovim.nix
+        ./modules/flake/toplevel.nix
+      ];
     };
 }

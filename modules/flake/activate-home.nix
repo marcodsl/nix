@@ -4,21 +4,28 @@
     pkgs,
     lib,
     ...
-  }: {
+  }: let
+    activateExe = lib.getExe self'.packages.activate;
+    nhExe = lib.getExe pkgs.nh;
+  in {
     apps = {
       activate = {
         inherit (self'.packages.activate) meta;
 
         program = pkgs.writeShellApplication {
           name = "activate-system";
-          runtimeInputs = [pkgs.hostname];
+          runtimeInputs = [pkgs.coreutils pkgs.hostname];
           text = ''
             set -euo pipefail
 
             original_args=("$@")
-            ref="localhost"
-            have_ref=0
+            target_ref="localhost"
+            have_target_ref=0
             dry_run=0
+
+            handoff_to_package_activate() {
+              exec ${activateExe} "''${original_args[@]}"
+            }
 
             while [ "$#" -gt 0 ]; do
               case "$1" in
@@ -26,14 +33,14 @@
                   dry_run=1
                   ;;
                 -*)
-                  exec ${lib.getExe self'.packages.activate} "''${original_args[@]}"
+                  handoff_to_package_activate
                   ;;
                 *)
-                  if [ "$have_ref" -eq 1 ]; then
-                    exec ${lib.getExe self'.packages.activate} "''${original_args[@]}"
+                  if [ "$have_target_ref" -eq 1 ]; then
+                    handoff_to_package_activate
                   fi
-                  ref="$1"
-                  have_ref=1
+                  target_ref="$1"
+                  have_target_ref=1
                   ;;
               esac
               shift
@@ -41,14 +48,14 @@
 
             current_host="$(hostname -s)"
 
-            case "$ref" in
+            case "$target_ref" in
               *@*)
-                exec ${lib.getExe self'.packages.activate} "''${original_args[@]}"
+                handoff_to_package_activate
                 ;;
               localhost|"$current_host")
                 ;;
               *)
-                exec ${lib.getExe self'.packages.activate} "''${original_args[@]}"
+                handoff_to_package_activate
                 ;;
             esac
 
@@ -60,12 +67,30 @@
               exit 1
             fi
 
-            subcommand="switch"
             if [ "$dry_run" -eq 1 ]; then
-              subcommand="dry-activate"
+              dry_args=(--dry)
+            else
+              dry_args=()
             fi
 
-            exec sudo -n /run/current-system/sw/bin/nixos-rebuild "$subcommand" --flake "$repo_root#$current_host"
+            nh_args=(
+              ${nhExe}
+              os
+              switch
+              -H "$current_host"
+              -R
+              "''${dry_args[@]}"
+              "$repo_root"
+            )
+
+            sudo "''${nh_args[@]}"
+
+            home_args=("$(id -un)@")
+            if [ "$dry_run" -eq 1 ]; then
+              home_args+=(--dry-run)
+            fi
+
+            exec ${activateExe} "''${home_args[@]}"
           '';
         };
       };
@@ -77,7 +102,7 @@
           name = "activate-home";
           text = ''
             set -x
-            ${lib.getExe self'.packages.activate} "$(id -un)"@
+            exec ${activateExe} "$(id -un)@" "$@"
           '';
         };
       };

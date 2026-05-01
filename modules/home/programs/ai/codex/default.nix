@@ -7,15 +7,15 @@
   inherit (lib) concatMapStringsSep filterAttrs;
 
   homeDirectory = config.home.homeDirectory;
-  skillsSource = ../skills;
-  skillsDir = "${homeDirectory}/.codex/skills";
-  skillEntries = builtins.readDir skillsSource;
-  managedSkills = builtins.attrNames (filterAttrs (_: type: type == "directory") skillEntries);
+  skillsSourceDir = ../skills;
+  installedSkillsDir = "${homeDirectory}/.codex/skills";
+  skillEntries = builtins.readDir skillsSourceDir;
+  managedSkillNames = builtins.attrNames (filterAttrs (_: entryType: entryType == "directory") skillEntries);
 
-  skillSource = name: "${skillsSource}/${name}";
-  skillTarget = name: "${skillsDir}/${name}";
+  skillSource = name: "${skillsSourceDir}/${name}";
+  skillTarget = name: "${installedSkillsDir}/${name}";
 
-  copySkillCommand = name: let
+  copyManagedSkillCommand = name: let
     source = lib.escapeShellArg (skillSource name);
     target = lib.escapeShellArg (skillTarget name);
   in ''
@@ -28,7 +28,7 @@
     $DRY_RUN_CMD ${pkgs.coreutils}/bin/chmod -R u+w ${target}
   '';
 
-  copySkillCommands = concatMapStringsSep "\n" copySkillCommand managedSkills;
+  copyManagedSkillCommands = concatMapStringsSep "\n" copyManagedSkillCommand managedSkillNames;
 in {
   home = {
     packages = with pkgs; [
@@ -36,7 +36,7 @@ in {
     ];
 
     activation.copyCodexSkills = lib.hm.dag.entryAfter ["writeBoundary"] ''
-      skills_dir=${lib.escapeShellArg skillsDir}
+      skills_dir=${lib.escapeShellArg installedSkillsDir}
 
       if [ -L "$skills_dir" ]; then
         $DRY_RUN_CMD ${pkgs.coreutils}/bin/rm "$skills_dir"
@@ -44,7 +44,7 @@ in {
 
       $DRY_RUN_CMD ${pkgs.coreutils}/bin/mkdir -p "$skills_dir"
 
-      ${copySkillCommands}
+      ${copyManagedSkillCommands}
     '';
   };
 }

@@ -2,7 +2,7 @@
   imports = [
     ./gcloud.nix
     ./libreoffice.nix
-    ./security.nix
+    ./security
   ];
 
   config = {

@@ -31,7 +31,7 @@ jobs:
           persist-credentials: false
       - uses: ./.github/actions/install-nix
       - name: Check formatting
-        run: nix fmt -- --check flake.nix configurations/ modules/ packages/
+        run: nix fmt -- --check flake.nix hosts/ modules/ packages/ users/
 
   check:
     name: Check flake
@@ -179,13 +179,12 @@ jobs:
         id: discover
         run: |
           mapfile -t hosts < <(
-            find configurations/nixos -mindepth 1 -maxdepth 1 \( -type d -o -name '*.nix' \) -printf '%f\n' \
-              | sed 's/\.nix$//' \
+            find hosts -mindepth 1 -maxdepth 1 -type d -printf '%f\n' \
               | sort -u
           )
 
           if [ "${#hosts[@]}" -eq 0 ]; then
-            echo "No NixOS hosts found under configurations/nixos" >&2
+            echo "No NixOS hosts found under hosts" >&2
             echo 'hosts=[]' >> "$GITHUB_OUTPUT"
             exit 0
           fi

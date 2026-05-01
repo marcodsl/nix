@@ -29,12 +29,12 @@ update input="":
 # Format Nix files in place
 [group('dev')]
 fmt:
-    nix fmt -- flake.nix configurations/ modules/ packages/
+    nix fmt -- flake.nix hosts/ modules/ packages/ users/
 
 # Check Nix file formatting without writing changes
 [group('dev')]
 lint:
-    nix fmt -- --check flake.nix configurations/ modules/ packages/
+    nix fmt -- --check flake.nix hosts/ modules/ packages/ users/
 
 # Check nix flake
 [group('dev')]

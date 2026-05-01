@@ -4,7 +4,7 @@
   ...
 }: {
   imports = [
-    (flake.inputs.self + /modules/shared/common)
+    (flake.inputs.self + /modules/shared)
     ./programs
     ./services
     ./system

@@ -1,4 +1,9 @@
-{lib, ...}: {
+{lib, ...}: let
+  skillsDir = ../skills;
+  skillEntries = builtins.readDir skillsDir;
+  skillDirectories = lib.filterAttrs (_: entryType: entryType == "directory") skillEntries;
+  configuredSkills = lib.mapAttrs (name: _: skillsDir + "/${name}") skillDirectories;
+in {
   programs.claude-code = {
     enable = true;
     enableMcpIntegration = true;
@@ -8,11 +13,6 @@
       theme = "dark";
     };
 
-    skills = let
-      dir = ../skills;
-      entries = builtins.readDir dir;
-      dirs = lib.filterAttrs (_: type: type == "directory") entries;
-    in
-      lib.mapAttrs (name: _: dir + "/${name}") dirs;
+    skills = configuredSkills;
   };
 }

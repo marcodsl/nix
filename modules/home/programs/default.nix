@@ -7,7 +7,7 @@
     ./direnv.nix
     ./gh.nix
     ./ghostty.nix
-    ./git.nix
+    ./git
     ./jujutsu.nix
     ./k9s.nix
     ./mullvad.nix

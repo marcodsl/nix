@@ -4,12 +4,12 @@
   pkgs,
   ...
 }: let
-  mapListToAttrs = m: f:
+  listToAttrsByName = names: valueForName:
     lib.listToAttrs (map (name: {
         inherit name;
-        value = f name;
+        value = valueForName name;
       })
-      m);
+      names);
 in {
   environment.systemPackages = with pkgs; [
     arion
@@ -34,7 +34,7 @@ in {
     };
   };
 
-  users.users = mapListToAttrs config.users' (name: {
+  users.users = listToAttrsByName config.users' (name: {
     extraGroups = ["podman"];
   });
 }
