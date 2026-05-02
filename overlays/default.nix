@@ -15,9 +15,6 @@ in
     isPackageEntry = name: entryType:
       isPackageFile name entryType || isPackageDirectory name entryType;
 
-    packageEntries = prev.lib.filterAttrs isPackageEntry entries;
-    packageEntryNames = builtins.attrNames packageEntries;
-
     packageAttrName = name: entryType:
       if entryType == "regular"
       then prev.lib.removeSuffix ".nix" name
@@ -28,8 +25,11 @@ in
       value = final.callPackage (packagesDir + "/${name}") {};
     };
 
-    localPackages =
-      builtins.listToAttrs (map (name: toPackage name packageEntries.${name}) packageEntryNames);
+    localPackages = prev.lib.pipe entries [
+      (prev.lib.filterAttrs isPackageEntry)
+      (prev.lib.mapAttrsToList toPackage)
+      builtins.listToAttrs
+    ];
   in
     localPackages
     // {

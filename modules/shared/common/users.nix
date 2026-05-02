@@ -20,11 +20,12 @@ in {
       description = "List of usernames";
       defaultText = "All users under ./configurations/home are included by default";
 
-      default = let
-        entries = builtins.readDir (self + /configurations/home);
-      in
-        map (f: lib.removeSuffix ".nix" f)
-        (builtins.filter (f: entries.${f} == "regular") (builtins.attrNames entries));
+      default = lib.pipe (self + /configurations/home) [
+        builtins.readDir
+        (lib.filterAttrs (_: type: type == "regular"))
+        builtins.attrNames
+        (map (lib.removeSuffix ".nix"))
+      ];
     };
   };
 

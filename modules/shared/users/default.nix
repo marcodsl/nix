@@ -19,10 +19,11 @@
   isManagedUser = username: entryType:
     entryType == "directory" && builtins.pathExists (userHomeModule username);
 
-  defaultUsers = let
-    userEntries = builtins.readDir usersDir;
-  in
-    builtins.filter (username: isManagedUser username userEntries.${username}) (builtins.attrNames userEntries);
+  defaultUsers = lib.pipe usersDir [
+    builtins.readDir
+    (lib.filterAttrs isManagedUser)
+    builtins.attrNames
+  ];
 
   mkSystemUser = _username:
     lib.optionalAttrs pkgs.stdenv.isLinux {

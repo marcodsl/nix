@@ -16,14 +16,13 @@
     isModuleNixFile name entryType || isModuleDirectory name entryType;
 
   moduleEntries = lib.filterAttrs isModuleEntry rootEntries;
-  entryNames = builtins.attrNames moduleEntries;
 
   entryAttrName = name: entryType:
     if entryType == "regular"
     then lib.removeSuffix ".nix" name
     else name;
 
-  declaredAttrNames = ["default"] ++ map (name: entryAttrName name moduleEntries.${name}) entryNames;
+  declaredAttrNames = ["default"] ++ lib.mapAttrsToList entryAttrName moduleEntries;
 
   duplicateAttrNames = lib.filter (
     attrName:
@@ -35,7 +34,7 @@
     value = rootPath + "/${name}";
   };
 
-  generatedModulePaths = builtins.listToAttrs (map (name: mkModulePathAttr name moduleEntries.${name}) entryNames);
+  generatedModulePaths = builtins.listToAttrs (lib.mapAttrsToList mkModulePathAttr moduleEntries);
 in
   if duplicateAttrNames != []
   then throw "module path collision under ${toString rootPath}: ${lib.concatStringsSep ", " duplicateAttrNames}"
