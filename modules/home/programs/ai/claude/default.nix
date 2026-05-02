@@ -1,18 +1,18 @@
-{lib, ...}: let
-  skillsDir = ../skills;
-  skillEntries = builtins.readDir skillsDir;
-  skillDirectories = lib.filterAttrs (_: entryType: entryType == "directory") skillEntries;
-  configuredSkills = lib.mapAttrs (name: _: skillsDir + "/${name}") skillDirectories;
-in {
+{lib, ...}: {
   programs.claude-code = {
     enable = true;
     enableMcpIntegration = true;
+
+    context = ./CLAUDE.md;
 
     settings = {
       includeCoAuthoredBy = false;
       theme = "dark";
     };
 
-    skills = configuredSkills;
+    skills = lib.pipe (builtins.readDir ../skills) [
+      (lib.filterAttrs (_: type: type == "directory"))
+      (lib.mapAttrs (name: _: ../skills + "/${name}"))
+    ];
   };
 }
