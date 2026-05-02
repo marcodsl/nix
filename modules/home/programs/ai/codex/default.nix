@@ -4,47 +4,48 @@
   pkgs,
   ...
 }: let
-  inherit (lib) concatMapStringsSep filterAttrs;
-
-  homeDirectory = config.home.homeDirectory;
   skillsSourceDir = ../skills;
-  installedSkillsDir = "${homeDirectory}/.codex/skills";
-  skillEntries = builtins.readDir skillsSourceDir;
-  managedSkillNames = builtins.attrNames (filterAttrs (_: entryType: entryType == "directory") skillEntries);
+  installedSkillsDir = "${config.home.homeDirectory}/.codex/skills";
 
-  skillSource = name: "${skillsSourceDir}/${name}";
-  skillTarget = name: "${installedSkillsDir}/${name}";
+  managedSkillNames = lib.pipe (builtins.readDir skillsSourceDir) [
+    (lib.filterAttrs (_: type: type == "directory"))
+    builtins.attrNames
+  ];
 
-  copyManagedSkillCommand = name: let
-    source = lib.escapeShellArg (skillSource name);
-    target = lib.escapeShellArg (skillTarget name);
-  in ''
-    if [ -d ${target} ] && [ ! -L ${target} ]; then
-      $DRY_RUN_CMD ${pkgs.coreutils}/bin/chmod -R u+w ${target}
+  # Codex mutates skill files at runtime, so deploy writable copies instead
+  # of nix-store symlinks (cf. copilot, which uses home.file).
+  installSkillsScript = ''
+    export PATH=${lib.makeBinPath [pkgs.coreutils]}:$PATH
+
+    skills_src=${lib.escapeShellArg (toString skillsSourceDir)}
+    skills_dst=${lib.escapeShellArg installedSkillsDir}
+
+    install_skill() {
+      local name=$1
+      local target="$skills_dst/$name"
+
+      if [ -d "$target" ] && [ ! -L "$target" ]; then
+        $DRY_RUN_CMD chmod -R u+w "$target"
+      fi
+      $DRY_RUN_CMD rm -rf "$target"
+      $DRY_RUN_CMD cp -RL "$skills_src/$name" "$target"
+      $DRY_RUN_CMD chmod -R u+w "$target"
+    }
+
+    if [ -L "$skills_dst" ]; then
+      $DRY_RUN_CMD rm "$skills_dst"
     fi
+    $DRY_RUN_CMD mkdir -p "$skills_dst"
 
-    $DRY_RUN_CMD ${pkgs.coreutils}/bin/rm -rf ${target}
-    $DRY_RUN_CMD ${pkgs.coreutils}/bin/cp -RL ${source} ${target}
-    $DRY_RUN_CMD ${pkgs.coreutils}/bin/chmod -R u+w ${target}
+    ${lib.concatMapStringsSep "\n"
+      (name: "install_skill ${lib.escapeShellArg name}")
+      managedSkillNames}
   '';
-
-  copyManagedSkillCommands = concatMapStringsSep "\n" copyManagedSkillCommand managedSkillNames;
 in {
   home = {
-    packages = with pkgs; [
-      codex
-    ];
+    packages = [pkgs.codex];
 
-    activation.copyCodexSkills = lib.hm.dag.entryAfter ["writeBoundary"] ''
-      skills_dir=${lib.escapeShellArg installedSkillsDir}
-
-      if [ -L "$skills_dir" ]; then
-        $DRY_RUN_CMD ${pkgs.coreutils}/bin/rm "$skills_dir"
-      fi
-
-      $DRY_RUN_CMD ${pkgs.coreutils}/bin/mkdir -p "$skills_dir"
-
-      ${copyManagedSkillCommands}
-    '';
+    activation.copyCodexSkills =
+      lib.hm.dag.entryAfter ["writeBoundary"] installSkillsScript;
   };
 }
