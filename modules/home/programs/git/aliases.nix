@@ -1,12 +1,12 @@
 {...}: {
-  programs.git.settings.aliases = {
+  programs.git.settings.alias = {
     br = "branch";
     c = "commit -m";
     ca = "commit -am";
     co = "checkout";
     cp = "cherry-pick";
     d = "diff";
-    df = "!git hist | peco | awk '{print $2}' | xargs -I {} git diff {}^ {}";
+    df = "!git hist | fzf | awk '{print $2}' | xargs -I {} git diff {}^ {}";
     edit-unmerged = "!f() { git ls-files --unmerged | cut -f2 | sort -u ; }; vim `f`";
     fuck = "commit --amend -m";
     graph = "log --all --decorate --graph";

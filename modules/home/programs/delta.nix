@@ -4,11 +4,10 @@
     enableGitIntegration = true;
 
     options = {
-      features = "decorations";
+      features = "side-by-side line-numbers decorations";
       dark = true;
       navigate = true;
-      line-numbers = true;
-      side-by-side = true;
+      hyperlinks = true;
       true-color = "always";
       whitespace-error-style = "22 reverse";
       syntax-theme = "base16-256";

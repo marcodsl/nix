@@ -26,6 +26,11 @@
 
     "*.swp"
     ".idea/"
+    ".vscode/"
     ".~lock*"
+
+    ".env"
+    ".env.*"
+    ".envrc.local"
   ];
 }
