@@ -33,6 +33,7 @@
   };
 
   homeConfigurationModules = username: [
+    inputs.sops-nix.homeManagerModules.sops
     homeCommonModule
     (userHomeModule username)
   ];
@@ -63,7 +64,10 @@ in {
         {
           home-manager = {
             extraSpecialArgs = flakeArgs;
-            sharedModules = [homeCommonModule];
+            sharedModules = [
+              homeCommonModule
+              inputs.sops-nix.homeManagerModules.sops
+            ];
             useUserPackages = true;
           };
         }

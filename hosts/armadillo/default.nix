@@ -66,6 +66,18 @@ in {
     };
   };
 
+  home-manager.users.marco = {
+    sops = {
+      age.keyFile = "/home/marco/.config/sops/age/keys.txt";
+      defaultSopsFile = "${self}/secrets/hosts/armadillo.yaml";
+
+      secrets = {
+        "mcp/github-token" = {};
+        "mcp/linear-token" = {};
+      };
+    };
+  };
+
   marco = {
     wifi = {
       interface = "wlp2s0";
