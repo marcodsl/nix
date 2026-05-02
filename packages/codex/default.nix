@@ -29,10 +29,6 @@
       native = "aarch64-apple-darwin";
       node = "darwin-arm64";
     };
-    "x86_64-darwin" = {
-      native = "x86_64-apple-darwin";
-      node = "darwin-x64";
-    };
     "x86_64-linux" = {
       native = "x86_64-unknown-linux-musl";
       node = "linux-x64";
@@ -52,14 +48,12 @@
 
   nativeHashes = {
     "aarch64-apple-darwin" = "1mgkm93msm1x938zqpqzyrb7pfihrny03106ih629349i8p20s7h";
-    "x86_64-apple-darwin" = "0qd94nh36z1m4vfwv0d622khfwy3xqy4fg0p5908hzpp24h8v867";
     "x86_64-unknown-linux-musl" = "0fp243xswx5fsgh00g8h7fji2dljprzh1jip8hil62wc27k8asw8";
     "aarch64-unknown-linux-musl" = "1l6blqxsl00ashvfzqx73gil1vm7z4dv9z5hzfzggsjg63av8q9i";
   };
 
   nodeOptionalDepHashes = {
     "darwin-arm64" = "16wx35sd6lvyy337gxa5rvbs2q0sd077a4ihs5y333g1gaarsj95";
-    "darwin-x64" = "07y25x9n5xsy8jm5qsmqyb9i7359yqspddpd7ncw4hy2f0yglkqz";
     "linux-x64" = "0y2khg9nd9g9rqfbyg7h4qrni2d72m6c48ndg5w3xxpjd97hn5i1";
     "linux-arm64" = "1bv5aylp4218n6194vgf6532y2ff42vwln3x6fxhjk549dlzm1x3";
   };
