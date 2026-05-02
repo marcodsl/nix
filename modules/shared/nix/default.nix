@@ -70,6 +70,7 @@ in {
       max-jobs = "auto";
       max-substitution-jobs = 32;
       narinfo-cache-negative-ttl = 300;
+      narinfo-cache-positive-ttl = 432000;
       stalled-download-timeout = 60;
       use-cgroups = true;
 

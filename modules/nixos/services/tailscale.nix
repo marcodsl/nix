@@ -14,6 +14,14 @@ in {
       extraSetFlags = ["--accept-dns=false"];
     };
 
-    systemd.services.tailscaled.after = ["nftables.service"];
+    systemd.services.tailscaled = {
+      after = ["nftables.service"];
+      serviceConfig = {
+        Nice = 5;
+        CPUWeight = 40;
+        IOSchedulingClass = "best-effort";
+        IOSchedulingPriority = 5;
+      };
+    };
   };
 }

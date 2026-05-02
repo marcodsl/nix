@@ -25,6 +25,7 @@ in {
 
       kernelParams = [
         "splash"
+        "transparent_hugepage=madvise"
       ];
 
       kernel.sysctl = flattenAttrs' {
@@ -33,7 +34,15 @@ in {
         vm = {
           vfs_cache_pressure = 50;
           dirty_ratio = 10;
+          dirty_background_ratio = 5;
+          swappiness = 180;
+          "page-cluster" = 0;
+          watermark_boost_factor = 0;
+          watermark_scale_factor = 125;
         };
+
+        net.core.default_qdisc = "fq";
+        net.ipv4.tcp_congestion_control = "bbr";
       };
 
       blacklistedKernelModules = [
@@ -66,5 +75,15 @@ in {
 
       amdgpu.initrd.enable = true;
     };
+
+    boot.kernelModules = ["tcp_bbr"];
+
+    services.udev.extraRules = ''
+      ACTION=="add|change", KERNEL=="nvme[0-9]*n[0-9]*", ATTR{queue/scheduler}="none", ATTR{queue/read_ahead_kb}="256"
+    '';
+
+    nix.daemonCPUSchedPolicy = "idle";
+    nix.daemonIOSchedClass = "idle";
+    nix.daemonIOSchedPriority = 7;
   };
 }
