@@ -47,8 +47,6 @@ jobs:
             script: packages/codex/update.rs
           - package: graphrag
             script: packages/graphrag/update.rs
-          - package: context-mode
-            script: packages/context-mode/update.rs
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
@@ -115,7 +113,6 @@ jobs:
             devenv.lock
             packages/codex/default.nix
             packages/graphrag/default.nix
-            packages/context-mode/default.nix
           commit-message: "ci: update lockfiles and packages"
           branch: ci/auto-update
           delete-branch: true
@@ -124,6 +121,6 @@ jobs:
             Automated update of lockfiles and package versions.
 
             - `flake.lock` and `devenv.lock` updated if newer revisions are available
-            - `codex`, `graphrag`, and `context-mode` updated to latest upstream versions
+            - `codex` and `graphrag` updated to latest upstream versions
           reviewers: |
             marcodsl

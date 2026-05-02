@@ -40,18 +40,6 @@ Use a local skill under `$HOME/.copilot/skills` when the request matches it:
 - Use language/framework skills for implementation details.
 - Use `prompt-engineering` for agent behavior and prompt structure; `natural-tone` only for prose cleanup.
 
-## Context-mode routing
-
-Use context-mode MCP tools when they reduce raw context:
-
-- `ctx_batch_execute(commands, queries)`: initial repo surveys, multi-file exploration, or gathering several command/search answers together.
-- `ctx_execute(language, code)`: analyze, count, filter, parse, transform, compare, or summarize data; especially structured output or command output likely over ~20 lines.
-- `ctx_execute_file(path, language, code)`: inspect or summarize file contents for analysis. Use direct reads only when file text must be in context to edit.
-- `ctx_fetch_and_index(url, source)` then `ctx_search(queries)`: web content. Do not use terminal HTTP helpers for this.
-- `ctx_search(queries)`: follow-up questions over already-indexed content; batch related questions.
-
-Detailed context-mode workflow lives at `$HOME/.copilot/instructions/context-mode.md`.
-
 ## Memory server routing
 
 Use the `memory` MCP server for cross-session context.

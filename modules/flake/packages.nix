@@ -146,7 +146,6 @@
         inherit activate update;
 
         codex = pkgs.callPackage ../../packages/codex {};
-        context-mode = pkgs.callPackage ../../packages/context-mode {};
         default = self'.packages.activate;
         graphrag = pkgs.callPackage ../../packages/graphrag {};
       }
