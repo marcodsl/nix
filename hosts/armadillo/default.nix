@@ -62,7 +62,7 @@ in {
     };
 
     extras = {
-      system.minimize-swapping = true;
+      system.minimize-swapping = false;
     };
   };
 
@@ -89,9 +89,9 @@ in {
     services = {
       caddy.enable = true;
       mullvad.enable = true;
-      ollama.enable = true;
+      ollama.enable = false;
       tailscale.enable = true;
-      vmware.enable = true;
+      vmware.enable = false;
     };
   };
 }
