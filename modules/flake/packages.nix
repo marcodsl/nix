@@ -145,9 +145,11 @@
       {
         inherit activate update;
 
-        codex = pkgs.callPackage ../../packages/codex {};
         default = self'.packages.activate;
-        graphrag = pkgs.callPackage ../../packages/graphrag {};
+
+        codex = pkgs.callPackage "${self}/packages/codex" {};
+        graphrag = pkgs.callPackage "${self}/packages/graphrag" {};
+        skills-ref = pkgs.callPackage "${self}/packages/skills-ref" {};
       }
       // lib.optionalAttrs burpSuiteProAvailable {
         burp-suite-pro = pkgs.callPackage burpSuiteProPath {};

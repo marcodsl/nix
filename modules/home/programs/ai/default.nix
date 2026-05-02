@@ -1,5 +1,9 @@
 # SPDX-License-Identifier: AGPL-3.0-only
-{pkgs, ...}: {
+{
+  pkgs,
+  lib,
+  ...
+}: {
   imports = [
     ./claude
     ./codex
@@ -8,9 +12,18 @@
     ./mcp.nix
   ];
 
+  options = {
+    me.ai.skills = lib.mkOption {
+      type = lib.types.path;
+      description = "Path to the skills directory.";
+      default = ./skills;
+    };
+  };
+
   config = {
-    home.packages = [
-      pkgs.graphrag
+    home.packages = with pkgs; [
+      graphrag
+      skills-ref
     ];
   };
 }
