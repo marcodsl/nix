@@ -4,7 +4,7 @@ description: "Generate and compare software-engineering ideas before converging 
 license: AGPL-3.0-only
 metadata:
   author: marcodsl
-  tags: [brainstorming, ideation, software-engineering, design]
+  tags: brainstorming, ideation, software-engineering, design
 ---
 
 # Brainstorming

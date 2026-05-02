@@ -4,7 +4,7 @@ description: "Write and review Dockerfiles with multi-stage builds, reproducible
 license: AGPL-3.0-only
 metadata:
   author: marcodsl
-  tags: [dockerfile, containers, multi-stage-builds, image-hardening, build-cache]
+  tags: dockerfile, containers, multi-stage-builds, image-hardening, build-cache
 ---
 
 # Dockerfile

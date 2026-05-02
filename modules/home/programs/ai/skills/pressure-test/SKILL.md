@@ -4,7 +4,7 @@ description: Stress-test a plan or design through a focused review that surfaces
 license: AGPL-3.0-only
 metadata:
   author: marcodsl
-  tags: [planning, design, review, interview]
+  tags: planning, design, review, interview
 ---
 
 # Pressure Test

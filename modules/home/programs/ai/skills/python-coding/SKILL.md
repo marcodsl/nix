@@ -4,7 +4,7 @@ description: "Write and review Python with strict verification and idiomatic des
 license: AGPL-3.0-only
 metadata:
   author: marcodsl
-  tags: [python, uv, ruff, mypy, pytest]
+  tags: python, uv, ruff, mypy, pytest
 ---
 
 # Python Coding

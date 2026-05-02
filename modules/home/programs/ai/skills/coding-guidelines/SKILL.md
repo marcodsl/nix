@@ -4,7 +4,7 @@ description: "Plan, design, architect, and review software solutions with struct
 license: AGPL-3.0-only
 metadata:
   author: marcodsl
-  tags: [architecture, code-review, planning, refactoring, testing]
+  tags: architecture, code-review, planning, refactoring, testing
 ---
 
 # Coding Guidelines

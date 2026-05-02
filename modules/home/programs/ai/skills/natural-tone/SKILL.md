@@ -4,7 +4,7 @@ description: "Write direct, human prose that replaces filler with concrete facts
 license: AGPL-3.0-only
 metadata:
   author: marcodsl
-  tags: [writing, editing, prose, documentation]
+  tags: writing, editing, prose, documentation
 ---
 
 # Natural Tone

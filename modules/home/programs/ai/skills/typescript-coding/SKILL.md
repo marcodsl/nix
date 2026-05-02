@@ -4,7 +4,7 @@ description: "Write and review TypeScript with strict verification and idiomatic
 license: AGPL-3.0-only
 metadata:
   author: marcodsl
-  tags: [typescript, tsc, eslint, prettier, vitest, bun]
+  tags: typescript, tsc, eslint, prettier, vitest, bun
 ---
 
 # TypeScript Coding

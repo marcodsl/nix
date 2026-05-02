@@ -4,7 +4,7 @@ description: "Create, update, or sync Linear issues with your current work: mark
 license: AGPL-3.0-only
 metadata:
   author: marcodsl
-  tags: [linear, issues, tracking]
+  tags: linear, issues, tracking
 ---
 
 # Linear Sync

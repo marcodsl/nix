@@ -4,7 +4,7 @@ description: "Write and review React 19+ code with strict verification and idiom
 license: AGPL-3.0-only
 metadata:
   author: marcodsl
-  tags: [react, react-compiler, server-components, vitest, testing-library, playwright]
+  tags: react, react-compiler, server-components, vitest, testing-library, playwright
 ---
 
 # React Guidelines

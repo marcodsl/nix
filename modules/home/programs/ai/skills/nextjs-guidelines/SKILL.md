@@ -4,7 +4,7 @@ description: "Write and review Next.js 16+ App Router code with strict verificat
 license: AGPL-3.0-only
 metadata:
   author: marcodsl
-  tags: [nextjs, app-router, cache-components, server-actions, ppr, vitest, playwright]
+  tags: nextjs, app-router, cache-components, server-actions, ppr, vitest, playwright
 ---
 
 # Next.js Guidelines

@@ -4,7 +4,7 @@ description: "Plan incremental refactors with structured discovery, scope contro
 license: AGPL-3.0-only
 metadata:
   author: marcodsl
-  tags: [planning, refactoring, incremental-change]
+  tags: planning, refactoring, incremental-change
 ---
 
 # Refactor Planning

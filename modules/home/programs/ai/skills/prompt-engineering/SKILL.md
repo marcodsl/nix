@@ -4,7 +4,7 @@ description: "Write and review LLM prompts and coding-agent instruction files. U
 license: AGPL-3.0-only
 metadata:
   author: marcodsl
-  tags: [prompts, agents, instructions]
+  tags: prompts, agents, instructions
 ---
 
 # Prompt Engineering

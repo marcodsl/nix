@@ -4,7 +4,7 @@ description: Plan atomic commits from the current working tree and emit a paste-
 license: AGPL-3.0-only
 metadata:
   author: marcodsl
-  tags: [git, commits, workflow, planning]
+  tags: git, commits, workflow, planning
 ---
 
 # Commit Plan

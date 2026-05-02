@@ -4,7 +4,7 @@ description: "Design and review API contracts with Google AIP conventions. Use w
 license: AGPL-3.0-only
 metadata:
   author: marcodsl
-  tags: [api-design, google-aip, contracts]
+  tags: api-design, google-aip, contracts
 ---
 
 ## Google AIP Adoption

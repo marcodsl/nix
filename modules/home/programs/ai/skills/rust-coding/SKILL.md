@@ -4,7 +4,7 @@ description: "Write and review Rust with strict verification and idiomatic desig
 license: AGPL-3.0-only
 metadata:
   author: marcodsl
-  tags: [rust, cargo, clippy]
+  tags: rust, cargo, clippy
 ---
 
 # Rust Coding

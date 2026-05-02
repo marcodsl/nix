@@ -4,7 +4,7 @@ description: "Create a reviewable map of the files, dependencies, tests, and ref
 license: AGPL-3.0-only
 metadata:
   author: marcodsl
-  tags: [discovery, scoping, dependencies, tests]
+  tags: discovery, scoping, dependencies, tests
 ---
 
 # Context Map

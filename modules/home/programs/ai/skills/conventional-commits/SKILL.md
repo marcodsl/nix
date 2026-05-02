@@ -4,7 +4,7 @@ description: "Generate or execute commit messages that conform to Conventional C
 license: AGPL-3.0-only
 metadata:
   author: marcodsl
-  tags: [git, commits, workflow, prompts]
+  tags: git, commits, workflow, prompts
 ---
 
 # Conventional Commits

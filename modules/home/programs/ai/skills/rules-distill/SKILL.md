@@ -4,7 +4,7 @@ description: "Distill shared rules from repeated skill guidance. Use when: extra
 license: AGPL-3.0-only
 metadata:
   author: marcodsl
-  tags: [rules, prompts, maintenance, synthesis]
+  tags: rules, prompts, maintenance, synthesis
 ---
 
 # Rules Distill
