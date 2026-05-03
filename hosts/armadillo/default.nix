@@ -17,27 +17,10 @@ in {
 
     self.nixosModules.default
     self.nixosModules.gui
+    self.nixosModules.sops-secrets
 
     ./hardware.nix
   ];
-
-  sops = {
-    age.sshKeyPaths = ["/etc/ssh/ssh_host_ed25519_key"];
-    defaultSopsFile = "${self}/secrets/hosts/armadillo.yaml";
-    validateSopsFiles = true;
-
-    secrets."github/token" = {};
-
-    templates."nix/github-access-tokens.conf" = {
-      path = "/etc/nix/github-access-tokens.conf";
-      content = ''
-        extra-access-tokens = github.com=${config.sops.placeholder."github/token"}
-      '';
-      owner = "root";
-      group = config.users.users.marco.group;
-      mode = "0440";
-    };
-  };
 
   nix = {
     extraOptions = lib.mkAfter ''
@@ -63,18 +46,6 @@ in {
 
     extras = {
       system.minimize-swapping = false;
-    };
-  };
-
-  home-manager.users.marco = {
-    sops = {
-      age.keyFile = "/home/marco/.config/sops/age/keys.txt";
-      defaultSopsFile = "${self}/secrets/hosts/armadillo.yaml";
-
-      secrets = {
-        "mcp/github-token" = {};
-        "mcp/linear-token" = {};
-      };
     };
   };
 

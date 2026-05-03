@@ -8,15 +8,6 @@ in {
   options.marco.services.ollama.enable = lib.mkEnableOption "Ollama service";
 
   config = lib.mkIf cfg.enable {
-    sops.secrets."ollama/api_key" = {};
-
-    sops.templates."ollama.env" = {
-      content = ''
-        OLLAMA_API_KEY=${config.sops.placeholder."ollama/api_key"}
-      '';
-      mode = "0440";
-    };
-
     services.ollama = {
       enable = true;
       openFirewall = lib.mkDefault false;

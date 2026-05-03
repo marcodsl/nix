@@ -46,11 +46,6 @@
 
     services.resolved.enable = true;
 
-    sops.secrets."networkmanager/wifi_profile" = {
-      mode = "0400";
-      restartUnits = ["networkmanager-static-wifi.service"];
-    };
-
     systemd.services.networkmanager-static-wifi = {
       description = "Apply static IPv4 settings to the Wi-Fi profile";
       wantedBy = ["multi-user.target" "network-online.target"];
