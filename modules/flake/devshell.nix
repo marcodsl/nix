@@ -3,7 +3,10 @@
 in {
   perSystem = {pkgs, ...}: {
     devShells.default = devenv.lib.mkShell {
-      inherit inputs pkgs;
+      inherit inputs;
+
+      # cachix/devenv's rust language module still references `pkgs.mold-wrapped`
+      pkgs = pkgs.extend (_final: prev: {mold-wrapped = prev.mold;});
 
       modules = [
         (self + /devenv.nix)

@@ -31,7 +31,7 @@
   };
 
   languages = {
-    bash.enable = true;
+    shell.enable = true;
     nix.enable = true;
 
     rust = {
