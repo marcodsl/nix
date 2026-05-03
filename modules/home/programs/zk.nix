@@ -1,6 +1,6 @@
 {config, ...}: {
   programs.zk = {
-    enable = true;
+    enable = false;
     settings = {
       notebook.dir = "${config.home.homeDirectory}/.zk";
 
