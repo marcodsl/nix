@@ -28,8 +28,25 @@
 
     btop.enable = true;
 
-    dircolors.enable = true;
-    eza.enable = true;
+    dircolors = {
+      enable = true;
+      enableZshIntegration = true;
+    };
+
+    eza = {
+      enable = true;
+      enableZshIntegration = true;
+      git = true;
+
+      icons = "auto";
+      colors = "auto";
+
+      extraOptions = [
+        "--header"
+        "--group-directories-last"
+      ];
+    };
+
     fastfetch.enable = true;
     fd.enable = true;
     fzf.enable = true;
