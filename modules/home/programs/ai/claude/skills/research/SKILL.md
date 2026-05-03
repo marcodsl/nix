@@ -1,6 +1,6 @@
 ---
 name: research
-description: Run deep research investigation using GitHub search and web sources
+description: Run deep multi-agent research that delegates investigation to a researcher subagent across GitHub repos, code, issues, PRs, and web sources, then synthesizes a cited final report with footnotes and (for technical deep-dives) Mermaid diagrams. Use when the user invokes /research, asks for thorough investigation of a topic, requests a codebase or architecture overview spanning multiple repos, wants a deep-dive explanation of how a system or library works, or needs a referenced report rather than a quick answer.
 ---
 
 <orchestrator_constraint>
@@ -81,7 +81,7 @@ Based on the query type, identify:
    - Repository naming patterns (e.g., `topic-hub`, `topic-service`, `topic-client`)
    - File paths (e.g., `src/`, `lib/`, `packages/`)
 3. **Search prioritization**:
-   - **ALWAYS prioritize internal/private org repos over public alternatives**
+   - **ALWAYS prioritize internal/private org repos over public alternatives.** Internal repos hold the authoritative implementation; public hits are often outdated forks, similarly-named unrelated projects, or generic docs that mislead synthesis. Fall back to public sources only when internal repos lack coverage or the topic is genuinely public (open-source library, public protocol, public API).
    - Search organization repos first: `org:ORGNAME topic`
    - Common internal patterns: `-hub`, `-service`, `-data`, `-internal`, `-client`, `-protos`
    - Pay attention to what the user emphasized in their query or recently in the conversation context — that often indicates where to focus.
