@@ -67,23 +67,25 @@
               exit 1
             fi
 
-            if [ "$dry_run" -eq 1 ]; then
-              dry_args=(--dry)
-            else
-              dry_args=()
+            if [ -e /etc/NIXOS ]; then
+              if [ "$dry_run" -eq 1 ]; then
+                dry_args=(--dry)
+              else
+                dry_args=()
+              fi
+
+              nh_args=(
+                ${nhExe}
+                os
+                switch
+                -H "$current_host"
+                -R
+                "''${dry_args[@]}"
+                "$repo_root"
+              )
+
+              exec sudo "''${nh_args[@]}"
             fi
-
-            nh_args=(
-              ${nhExe}
-              os
-              switch
-              -H "$current_host"
-              -R
-              "''${dry_args[@]}"
-              "$repo_root"
-            )
-
-            sudo "''${nh_args[@]}"
 
             home_args=("$(id -un)@")
             if [ "$dry_run" -eq 1 ]; then
