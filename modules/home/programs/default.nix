@@ -13,6 +13,7 @@
     ./mullvad.nix
     ./nix-index.nix
     ./obs.nix
+    ./senpai.nix
     ./tmux.nix
     ./yt-dlp.nix
     ./zk.nix
@@ -46,9 +47,6 @@
 
     man.enable = true;
     pandoc.enable = true;
-    # If Linux
-    # sagemath.enable = pkgs.stdenv.isLinux;
-    senpai.enable = false; # TODO: setup secret management before enabling
 
     lazygit.enable = true;
     zoxide.enable = true;
