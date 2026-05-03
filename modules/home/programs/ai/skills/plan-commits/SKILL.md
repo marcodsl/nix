@@ -1,5 +1,5 @@
 ---
-name: commit-plan
+name: plan-commits
 description: Plan atomic commits from the current working tree and emit a paste-ready bash script; use when you want to stage and commit changes.
 license: AGPL-3.0-only
 metadata:
@@ -7,7 +7,7 @@ metadata:
   tags: git, commits, workflow, planning
 ---
 
-# Commit Plan
+# Plan Commits
 
 Investigate the working tree, group changes into atomic commits, write Conventional Commits messages, and emit a paste-ready shell script. Do not run any mutating git commands yourself.
 
