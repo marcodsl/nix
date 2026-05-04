@@ -29,6 +29,7 @@ in {
     settings = {
       includeCoAuthoredBy = false;
       theme = "dark";
+      enabledMcpjsonServers = lib.attrNames config.programs.mcp.servers;
     };
 
     skills = let
