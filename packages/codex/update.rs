@@ -14,14 +14,13 @@ type Hashes = BTreeMap<String, String>;
 const GITHUB_LATEST_RELEASE: &str = "https://api.github.com/repos/openai/codex/releases/latest";
 const NPM_LATEST: &str = "https://registry.npmjs.org/@openai/codex/latest";
 
-const NATIVE_PLATFORMS: [&str; 4] = [
+const NATIVE_PLATFORMS: [&str; 3] = [
     "aarch64-apple-darwin",
-    "x86_64-apple-darwin",
     "x86_64-unknown-linux-musl",
     "aarch64-unknown-linux-musl",
 ];
 
-const NODE_PLATFORMS: [&str; 4] = ["darwin-arm64", "darwin-x64", "linux-x64", "linux-arm64"];
+const NODE_PLATFORMS: [&str; 3] = ["darwin-arm64", "linux-x64", "linux-arm64"];
 
 fn main() {
     if let Err(error) = run() {
