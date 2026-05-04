@@ -1,28 +1,8 @@
-{
-  config,
-  lib,
-  ...
-}: let
-  copilotMcpServers = lib.mapAttrs (_: server:
-    if server ? command
-    then
-      server
-      // {
-        args = server.args or [];
-      }
-    else server)
-  config.programs.mcp.servers;
-in {
-  home.file = {
-    ".copilot/skills" = {
-      source = ../skills;
-      recursive = true;
-    };
-
-    ".copilot/copilot-instructions.md".source = ./copilot-instructions.md;
-
-    ".copilot/mcp-config.json".text = builtins.toJSON {
-      mcpServers = copilotMcpServers;
-    };
+{config, ...}: {
+  programs.github-copilot-cli = {
+    enable = true;
+    enableMcpIntegration = true;
+    context = ./copilot-instructions.md;
+    skills = config.me.ai.skills;
   };
 }
