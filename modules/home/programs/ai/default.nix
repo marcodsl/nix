@@ -8,6 +8,7 @@
     ./claude
     ./codex
     ./copilot
+    ./opencode
 
     ./mcp.nix
   ];
