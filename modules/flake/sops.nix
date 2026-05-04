@@ -50,6 +50,7 @@ in {
       secrets = {
         "mcp/github-token" = {};
         "mcp/linear-token" = {};
+        "mcp/todoist-token" = {};
         "senpai/password" = {};
       };
     };

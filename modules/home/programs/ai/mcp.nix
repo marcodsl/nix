@@ -16,6 +16,12 @@
       --header "Authorization:Bearer $(cat ${config.sops.secrets."mcp/linear-token".path})"
   '';
 
+  todoist = pkgs.writeShellScript "todoist-mcp-wrapper" ''
+    export TODOIST_API_KEY="$(cat ${config.sops.secrets."mcp/todoist-token".path})"
+
+    ${lib.getExe' pkgs.nodejs "npx"} @doist/todoist-ai
+  '';
+
   context7 = lib.getExe' pkgs.context7-mcp "context7-mcp";
   markitdown = lib.getExe' pkgs.markitdown-mcp "markitdown-mcp";
 in {
@@ -27,6 +33,7 @@ in {
       github.command = github;
       linear.command = linear;
       markitdown.command = markitdown;
+      todoist.command = todoist;
     };
   };
 }
