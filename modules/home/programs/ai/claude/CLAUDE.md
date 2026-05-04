@@ -14,7 +14,7 @@ See https://devenv.sh/ad-hoc-developer-environments/
 
 Use these when the task calls for it:
 
-- `github-mcp` — GitHub API: issues, PRs, code search, Actions, code security
-- `linear-mcp` — Linear project management: issues, projects, cycles
-- `context7-mcp` — Library and framework documentation lookup
+- `github` — GitHub API: issues, PRs, code search, Actions, code security
+- `linear` — Linear project management: issues, projects, cycles
+- `context7` — Library and framework documentation lookup
 - `markitdown` — Convert documents (PDF, DOCX, HTML) to markdown
