@@ -1,8 +1,15 @@
 {
   config,
   lib,
+  pkgs,
   ...
 }: let
+  stopHook = pkgs.writeShellApplication {
+    name = "claude-stop-hook";
+    runtimeInputs = with pkgs; [jq nix gnugrep coreutils];
+    text = builtins.readFile ./hooks/stop.sh;
+  };
+
   mkClaudeAgent = {
     name,
     description,
@@ -30,6 +37,16 @@ in {
       includeCoAuthoredBy = false;
       theme = "dark";
       enabledMcpjsonServers = lib.attrNames config.programs.mcp.servers;
+      hooks.Stop = [
+        {
+          hooks = [
+            {
+              type = "command";
+              command = lib.getExe stopHook;
+            }
+          ];
+        }
+      ];
     };
 
     skills = let
