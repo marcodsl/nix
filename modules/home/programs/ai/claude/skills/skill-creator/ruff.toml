@@ -1,0 +1,4 @@
+extend = "~/.config/ruff/ruff.toml"
+
+[lint]
+extend-ignore = ["E501"]
