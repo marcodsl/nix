@@ -49,6 +49,10 @@ in {
     };
   };
 
+  networking.firewall.extraInputRules = ''
+    ip saddr 192.168.0.0/24 tcp dport { 3000, 8000 } accept
+  '';
+
   marco = {
     wifi = {
       interface = "wlp2s0";
@@ -59,6 +63,7 @@ in {
 
     services = {
       caddy.enable = true;
+      deskflow.enable = true;
       mullvad.enable = true;
       ollama.enable = false;
       tailscale.enable = true;
