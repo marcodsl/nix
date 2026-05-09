@@ -7,13 +7,16 @@
   github = pkgs.writeShellScript "github-mcp-wrapper" ''
     export GITHUB_TOOLSETS="default,actions,code_security,copilot"
     export GITHUB_PERSONAL_ACCESS_TOKEN="$(cat ${config.sops.secrets."mcp/github-token".path})"
+
     exec ${lib.getExe pkgs.github-mcp-server} stdio
   '';
 
   linear = pkgs.writeShellScript "linear-mcp-wrapper" ''
+    export LINEAR_API_KEY="$(cat ${config.sops.secrets."mcp/linear-token".path})"
+
     ${lib.getExe' pkgs.nodejs "npx"} -y mcp-remote \
       https://mcp.linear.app/mcp \
-      --header "Authorization:Bearer $(cat ${config.sops.secrets."mcp/linear-token".path})"
+      --header "Authorization:Bearer ''${LINEAR_API_KEY}"
   '';
 
   todoist = pkgs.writeShellScript "todoist-mcp-wrapper" ''
@@ -23,17 +26,21 @@
   '';
 
   context7 = lib.getExe' pkgs.context7-mcp "context7-mcp";
-  markitdown = lib.getExe' pkgs.markitdown-mcp "markitdown-mcp";
 in {
   programs.mcp = {
     enable = true;
 
-    servers = {
-      context7.command = context7;
-      github.command = github;
-      linear.command = linear;
-      markitdown.command = markitdown;
-      todoist.command = todoist;
+    servers = let
+      mkServer = command: {
+        inherit command;
+        args = [];
+        env = {};
+      };
+    in {
+      context7 = mkServer context7;
+      github = mkServer github;
+      linear = mkServer linear;
+      todoist = mkServer todoist;
     };
   };
 }
