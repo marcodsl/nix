@@ -103,7 +103,7 @@
         program = pkgs.writeShellApplication {
           name = "activate-home";
           text = ''
-            set -x
+            set -euo pipefail
             exec ${activateExe} "$(id -un)@" "$@"
           '';
         };
