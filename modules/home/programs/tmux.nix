@@ -42,6 +42,7 @@
     extraConfig = ''
       # Truecolor for Ghostty (local) and Windows Terminal (SSH).
       set -as terminal-features ",*:RGB"
+      set -as terminal-features ",xterm-256color:extkeys"
 
       # OSC 52 — system clipboard works through SSH without X/Wayland forwarding.
       set -g set-clipboard on
