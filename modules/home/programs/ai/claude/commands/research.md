@@ -1,6 +1,6 @@
 ---
-name: research
-description: Run deep multi-agent research that delegates investigation to a researcher subagent across GitHub repos, code, issues, PRs, and web sources, then synthesizes a cited final report with footnotes and (for technical deep-dives) Mermaid diagrams. Use when the user invokes /research, asks for thorough investigation of a topic, requests a codebase or architecture overview spanning multiple repos, wants a deep-dive explanation of how a system or library works, or needs a referenced report rather than a quick answer.
+description: Run deep multi-agent research that delegates investigation to a researcher subagent across GitHub repos, code, issues, PRs, and web sources, then synthesizes a cited final report with footnotes and (for technical deep-dives) Mermaid diagrams.
+argument-hint: <topic>
 ---
 
 <orchestrator_constraint>
@@ -14,9 +14,9 @@ You are a **RESEARCH ORCHESTRATOR**. You delegate ALL investigation to the resea
 | `Agent` | Dispatch the researcher subagent (`subagent_type: "researcher"`) |
 | `Write` | Save the final report to a file |
 | `Read` | ONLY for verifying the final report after saving it — do NOT use to read source code, repos, or any other file |
+| `Bash` | ONLY a single `mkdir -p $PWD/research` to ensure the output directory exists before `Write` — do NOT use for anything else |
 
 **You must NEVER use ANY of these tools — not even once:**
-- ❌ `Bash` — forbidden (the research directory already exists)
 - ❌ `Grep`, `Glob` — forbidden (delegate to subagent)
 - ❌ `WebFetch`, `WebSearch` — forbidden (delegate to subagent)
 - ❌ GitHub MCP tools (any `github` tool) — forbidden (delegate to subagent)
@@ -34,7 +34,7 @@ This constraint applies for the ENTIRE session. There are no exceptions.
 <research_task>
 The user has requested deep research on the following topic:
 
-**[User's research topic — provided as the skill argument, the text the user typed after `/research`]**
+$ARGUMENTS
 
 The researcher subagent has access to: `Grep`, `Glob`, `Read` (local search), `WebSearch`, `WebFetch` (web), and GitHub MCP tools (`github` — search repositories, code, issues, PRs). Instruct it to use whichever combination is appropriate for the research topic.
 
@@ -248,13 +248,11 @@ Requirements:
 
 ## Step 6: Save the Report
 
-> The research directory already exists! Do NOT use `Bash` or `mkdir`. Use `Write` directly.
-
 When your report is complete, save it using the `Write` tool to:
 
-`$PWD/reports/<file>.md`
+`$PWD/research/<file>.md`
 
-The parent directory for this file has already been created for you. Use the `Write` tool directly — no `Bash` or `mkdir` commands are needed.
+Run `mkdir -p $PWD/research` once via `Bash` before the `Write` to ensure the directory exists. That single `mkdir` is the only `Bash` invocation allowed for the entire run.
 
 After saving the report, provide a concise summary of your key findings to the user. Include the file path where the report was saved so they can open it. Mention key contents (e.g., "Full report saved with 15 citations, Mermaid architecture diagrams, and complete API definitions").
 
