@@ -7,7 +7,6 @@
   gnomeExtensions = with pkgs.gnomeExtensions; [
     appindicator
     arcmenu
-    blur-my-shell
     dash-to-panel
   ];
 
@@ -21,6 +20,23 @@ in {
   config = lib.mkIf config.services.desktopManager.gnome.enable {
     services.dbus.packages = with pkgs; [gnome2.GConf];
     services.sysprof.enable = lib.mkDefault true;
+
+    services.gnome = {
+      evolution-data-server.enable = lib.mkForce false;
+      gnome-online-accounts.enable = lib.mkForce false;
+    };
+
+    environment.gnome.excludePackages = with pkgs; [
+      epiphany
+      evolution
+      geary
+      gnome-contacts
+      gnome-maps
+      gnome-music
+      gnome-tour
+      simple-scan
+      yelp
+    ];
 
     environment.systemPackages = systemPackages;
 
