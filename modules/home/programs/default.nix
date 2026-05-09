@@ -5,6 +5,7 @@
     ./astral.nix
     ./delta.nix
     ./direnv.nix
+    ./firefox.nix
     ./gh.nix
     ./ghostty.nix
     ./git
