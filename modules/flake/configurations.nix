@@ -63,6 +63,7 @@ in {
         inputs.home-manager.nixosModules.home-manager
         {
           home-manager = {
+            backupFileExtension = "hm-bak";
             extraSpecialArgs = flakeArgs;
             sharedModules = [
               homeCommonModule
