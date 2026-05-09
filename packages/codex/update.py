@@ -117,8 +117,16 @@ def node_release_url(version: str, platform: str) -> str:
 
 
 def fetch_json(url: str) -> dict:
-    with urllib.request.urlopen(url) as response:
+    with _urlopen_https(url) as response:
         return json.load(response)
+
+
+def _urlopen_https(url: str):
+    if not url.startswith("https://"):
+        raise ValueError(f"refusing to fetch non-https URL: {url!r}")
+
+    # nosemgrep: python.lang.security.audit.dynamic-urllib-use-detected.dynamic-urllib-use-detected
+    return urllib.request.urlopen(url)
 
 
 def prefetch(url: str) -> str:

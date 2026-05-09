@@ -97,17 +97,25 @@ def fetch_wheel_info(package_name: str, version: str) -> dict[str, str]:
 
 
 def fetch_json(url: str) -> dict:
-    with urllib.request.urlopen(url) as response:
+    with _urlopen_https(url) as response:
         return json.load(response)
 
 
 def fetch_sri_hash(url: str) -> str:
     print(f"hashing {url}")
     h = hashlib.sha256()
-    with urllib.request.urlopen(url) as response:
+    with _urlopen_https(url) as response:
         for chunk in iter(lambda: response.read(65536), b""):
             h.update(chunk)
     return f"sha256-{base64.b64encode(h.digest()).decode()}"
+
+
+def _urlopen_https(url: str):
+    if not url.startswith("https://"):
+        raise ValueError(f"refusing to fetch non-https URL: {url!r}")
+
+    # nosemgrep: python.lang.security.audit.dynamic-urllib-use-detected.dynamic-urllib-use-detected
+    return urllib.request.urlopen(url)
 
 
 def extract_nix_version(text: str) -> str:
