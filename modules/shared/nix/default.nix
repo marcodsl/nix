@@ -67,7 +67,8 @@ in {
       http-connections = 50;
       keep-going = true;
       max-call-depth = "1000000";
-      max-jobs = "auto";
+      max-jobs = 2;
+      cores = 4;
       max-substitution-jobs = 32;
       narinfo-cache-negative-ttl = 300;
       narinfo-cache-positive-ttl = 432000;
