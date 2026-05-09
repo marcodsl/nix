@@ -18,3 +18,12 @@ Use these when the task calls for it:
 - `linear` — Linear project management: issues, projects, cycles
 - `context7` — Library and framework documentation lookup
 - `markitdown` — Convert documents (PDF, DOCX, HTML) to markdown
+
+## Build & Verification
+- For Nix/home-manager changes, apply via `just run` rather than calling home-manager directly
+- After flake changes, verify with `nix flake check` (preserve `--no-pure-eval` if present — it is NOT a no-op)
+- Don't trust reviewer claims that flags are no-ops without verifying
+
+## Python Code Quality
+- Run lint (Ruff) and type checks proactively after Python edits, not after the user asks
+- Avoid `NoReturn` annotations on FastAPI handlers — they break response-model inference
