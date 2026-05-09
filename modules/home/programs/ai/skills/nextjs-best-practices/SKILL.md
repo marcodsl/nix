@@ -1,5 +1,5 @@
 ---
-name: next-best-practices
+name: nextjs-best-practices
 description: "Next.js best practices reference — file conventions, RSC boundaries, async APIs, data patterns, route handlers, metadata, image/font, bundling, hydration, suspense, parallel routes, self-hosting. Auto-applied background skill alongside nextjs-guidelines."
 license: Unlicensed
 metadata:
