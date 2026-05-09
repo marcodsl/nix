@@ -1,6 +1,7 @@
 {...}: {
   imports = [
     ./caddy.nix
+    ./deskflow.nix
     ./loaders.nix
     ./mullvad.nix
     ./ntpd.nix
