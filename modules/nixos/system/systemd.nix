@@ -10,6 +10,15 @@
         DefaultTimeoutAbortSec = lib.mkDefault "10s";
         DefaultDeviceTimeoutSec = lib.mkDefault "10s";
       };
+
+      oomd = {
+        enable = lib.mkDefault true;
+        enableUserSlices = lib.mkDefault true;
+        enableRootSlice = lib.mkDefault true;
+        settings.OOM = {
+          DefaultMemoryPressureDurationSec = "20s";
+        };
+      };
     };
   };
 }
