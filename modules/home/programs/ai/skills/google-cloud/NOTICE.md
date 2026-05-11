@@ -1,8 +1,8 @@
 # Google Cloud Skills — Third-Party Attribution
 
-The following skills in this directory are unmodified imports from the
+The following references under `references/` are imports from the
 [google/skills](https://github.com/google/skills) repository, distributed under
-the Apache License 2.0 (see `google-cloud-LICENSE`):
+the Apache License 2.0 (see `LICENSE` in this directory):
 
 - `alloydb-basics`
 - `bigquery-basics`
@@ -18,6 +18,12 @@ the Apache License 2.0 (see `google-cloud-LICENSE`):
 - `google-cloud-waf-reliability`
 - `google-cloud-waf-security`
 
+The body content of each upstream `SKILL.md` was relocated to
+`references/<name>.md` and its YAML frontmatter stripped so the merged parent
+skill in `SKILL.md` carries the only frontmatter. Per-skill `references/` and
+`assets/` subdirectories were nested under `references/<name>/`. No prose was
+modified.
+
 ## Source
 
 - Upstream: <https://github.com/google/skills>
@@ -31,7 +37,7 @@ name agree. File contents are unchanged.
 
 ## License
 
-These skills are licensed under the Apache License, Version 2.0. The full
-license text is in `google-cloud-LICENSE`. The remainder of this dotfiles
+These references are licensed under the Apache License, Version 2.0. The full
+license text is in `LICENSE` in this directory. The remainder of this dotfiles
 repository is licensed separately (AGPL-3.0-only); the Apache-2.0 terms apply
-only to the directories listed above and to `google-cloud-LICENSE` itself.
+only to the listed references and to `LICENSE` itself.

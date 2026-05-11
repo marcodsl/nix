@@ -1,18 +1,3 @@
----
-name: cloud-sql-basics
-description: >-
-  This file generates or explains Cloud SQL resources. Use this file when the
-  user asks to create a Cloud SQL instance or database for MySQL, PostgreSQL, or
-  SQL Server.
-
-  Cloud SQL manages third-party MySQL, PostgreSQL, and SQL Server instances as
-  resources in Cloud SQL. For example, when Cloud SQL creates an open-source
-  MySQL instance, the resulting resource is a Cloud SQL for MySQL instance that
-  Google Cloud manages.
-
-  Cloud SQL handles backups, high availability, and secure connectivity for
-  relational database workloads.
----
 
 # Cloud SQL Basics
 
@@ -83,22 +68,22 @@ access to Cloud SQL resources.
 
 ## Reference Directory
 
--   [Core Concepts](references/core-concepts.md): Instance architecture, high
+-   [Core Concepts](cloud-sql-basics/core-concepts.md): Instance architecture, high
     availability (HA), and supported database engines.
 
--   [CLI Usage](references/cli-usage.md): Essential `gcloud sql` commands for
+-   [CLI Usage](cloud-sql-basics/cli-usage.md): Essential `gcloud sql` commands for
     instance, database, and user management.
 
--   [Client Libraries & Connectors](references/client-library-usage.md):
+-   [Client Libraries & Connectors](cloud-sql-basics/client-library-usage.md):
     Connecting to Cloud SQL using Python, Java, Node.js, and Go.
 
--   [MCP Usage](references/mcp-usage.md): Using the Cloud SQL remote MCP
+-   [MCP Usage](cloud-sql-basics/mcp-usage.md): Using the Cloud SQL remote MCP
     server and Gemini CLI extension.
 
--   [Infrastructure as Code](references/iac-usage.md): Terraform
+-   [Infrastructure as Code](cloud-sql-basics/iac-usage.md): Terraform
     configuration for instances, databases, and users.
 
--   [IAM & Security](references/iam-security.md): Predefined roles, SSL/TLS
+-   [IAM & Security](cloud-sql-basics/iam-security.md): Predefined roles, SSL/TLS
     certificates, and Auth Proxy configuration.
 
 *If you need product information not found in these references, use the

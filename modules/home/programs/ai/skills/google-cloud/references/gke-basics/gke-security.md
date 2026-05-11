@@ -51,7 +51,7 @@ kubectl annotate serviceaccount <KSA_NAME> \
   iam.gke.io/gcp-service-account=<GSA_NAME>@<PROJECT_ID>.iam.gserviceaccount.com
 ```
 
-> See [assets/workload-identity-pod.yaml](../assets/workload-identity-pod.yaml) for a test pod.
+> See [assets/workload-identity-pod.yaml](./assets/workload-identity-pod.yaml) for a test pod.
 
 ### Verification
 

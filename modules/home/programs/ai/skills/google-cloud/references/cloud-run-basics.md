@@ -1,10 +1,3 @@
----
-name: cloud-run-basics
-description: >-
-  Manages Cloud Run services, jobs, and worker pools. Use when you need to deploy applications
-  responding to HTTP requests (services), run event-triggered or scheduled tasks (jobs),
-  or handle always-on pull-based background processing (worker pools).
----
 
 # Cloud Run Basics
 
@@ -341,7 +334,7 @@ Replace `WORKER_POOL_NAME` with the name you want for your worker pool.
 ### What to do if a deployment fails:
 
 1.  **IAM/Permission Error:** Read
-    [iam-security.md](references/iam-security.md).
+    [iam-security.md](cloud-run-basics/iam-security.md).
 2.  **Crash on Boot / Healthcheck failed:** Fetch the logs immediately using
     `gcloud logging read "resource.labels.service_name=SERVICE_NAME" --limit=20`
     to find the exact runtime error.
@@ -350,22 +343,22 @@ Replace `WORKER_POOL_NAME` with the name you want for your worker pool.
 
 ## Reference Directory
 
--   [Core Concepts](references/core-concepts.md): Services vs. Jobs vs.
+-   [Core Concepts](cloud-run-basics/core-concepts.md): Services vs. Jobs vs.
     Worker pools, resource model, and auto-scaling behavior for services.
 
--   [CLI Usage](references/cli-usage.md): Essential `gcloud run` commands for
+-   [CLI Usage](cloud-run-basics/cli-usage.md): Essential `gcloud run` commands for
     deployment and management.
 
--   [Client Libraries](references/client-library-usage.md): Using Google
+-   [Client Libraries](cloud-run-basics/client-library-usage.md): Using Google
     Cloud client libraries to interact with Cloud Run.
 
--   [MCP Usage](references/mcp-usage.md): Using the Cloud Run remote MCP
+-   [MCP Usage](cloud-run-basics/mcp-usage.md): Using the Cloud Run remote MCP
     server.
 
--   [Infrastructure as Code](references/iac-usage.md): Terraform examples for
+-   [Infrastructure as Code](cloud-run-basics/iac-usage.md): Terraform examples for
     services, jobs, worker pools, and IAM bindings.
 
--   [IAM & Security](references/iam-security.md): Roles, service identities,
+-   [IAM & Security](cloud-run-basics/iam-security.md): Roles, service identities,
     and ingress/egress controls.
 
 *If you need product information not found in these references, use the

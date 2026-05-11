@@ -1,13 +1,3 @@
----
-name: bigquery-basics
-description: >-
-  Manages datasets, tables, and jobs in BigQuery, and integrates with BigQuery
-  ML and Gemini for advanced data analytics and AI-driven insights. Use when
-  you need to interact with BigQuery, run SQL queries, manage BigQuery
-  resources, or leverage BigQuery's built-in ML capabilities. Also use when
-  performing data analysis, ingesting data into BigQuery, or developing AI
-  applications on BigQuery.
----
 
 # BigQuery Basics
 
@@ -63,22 +53,22 @@ intelligence capabilities.
 
 ## Reference Directory
 
-- [Core Concepts](references/core-concepts.md): Storage types, analytics
+- [Core Concepts](bigquery-basics/core-concepts.md): Storage types, analytics
   workflows, and BigQuery Studio features.
 
-- [CLI Usage](references/cli-usage.md): Essential `bq` command-line tool
+- [CLI Usage](bigquery-basics/cli-usage.md): Essential `bq` command-line tool
   operations for managing data and jobs.
 
-- [Client Libraries](references/client-library-usage.md): Using Google Cloud
+- [Client Libraries](bigquery-basics/client-library-usage.md): Using Google Cloud
   client libraries for Python, Java, Node.js, and Go.
 
-- [MCP Usage](references/mcp-usage.md): Using the BigQuery remote MCP server and
+- [MCP Usage](bigquery-basics/mcp-usage.md): Using the BigQuery remote MCP server and
   Gemini CLI extension.
 
-- [Infrastructure as Code](references/iac-usage.md): Terraform examples for
+- [Infrastructure as Code](bigquery-basics/iac-usage.md): Terraform examples for
   datasets, tables, and reservations.
 
-- [IAM & Security](references/iam-security.md): Roles, permissions, and data
+- [IAM & Security](bigquery-basics/iam-security.md): Roles, permissions, and data
   governance best practices.
 
 *If you need product information not found in these references, use the

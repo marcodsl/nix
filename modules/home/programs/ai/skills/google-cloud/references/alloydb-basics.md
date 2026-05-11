@@ -1,9 +1,3 @@
----
-name: alloydb-basics
-description: >-
-  Manages clusters, instances, and backups for AlloyDB for PostgreSQL, and
-  integrates with AlloyDB model context protocol (MCP) tools for automated database operations.
----
 
 # AlloyDB Basics
 
@@ -44,22 +38,22 @@ endpoint management to help developers build AI apps faster.
 
 ## Reference Directory
 
--   [Core Concepts](references/core-concepts.md): Architecture, disaggregated
+-   [Core Concepts](alloydb-basics/core-concepts.md): Architecture, disaggregated
     storage, and performance features.
 
--   [CLI Usage](references/cli-usage.md): Essential `gcloud alloydb` commands
+-   [CLI Usage](alloydb-basics/cli-usage.md): Essential `gcloud alloydb` commands
     for cluster and instance management.
 
--   [Client Libraries & Connectors](references/client-library-usage.md):
+-   [Client Libraries & Connectors](alloydb-basics/client-library-usage.md):
     Connecting to AlloyDB using Python, Java, Node.js, and Go.
 
--   [MCP Usage](references/mcp-usage.md): Using the AlloyDB remote MCP server
+-   [MCP Usage](alloydb-basics/mcp-usage.md): Using the AlloyDB remote MCP server
     and Gemini CLI extension.
 
--   [Infrastructure as Code](references/iac-usage.md): Terraform
+-   [Infrastructure as Code](alloydb-basics/iac-usage.md): Terraform
     configuration and deployment examples.
 
--   [IAM & Security](references/iam-security.md): Predefined roles, service
+-   [IAM & Security](alloydb-basics/iam-security.md): Predefined roles, service
     agents, and database authentication.
 
 *If you need product information not found in these references, use the

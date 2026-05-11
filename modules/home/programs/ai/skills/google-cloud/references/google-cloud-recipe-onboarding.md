@@ -1,7 +1,3 @@
----
-name: google-cloud-recipe-onboarding
-description: Guidance for a developer's first steps on Google Cloud, covering account creation, billing setup, project management, and deploying a first resource.
----
 
 # Onboarding to Google Cloud
 
@@ -123,6 +119,8 @@ Congrats - you just deployed your first Google Cloud resource!
 -   See the [full list of 150+ Google Cloud products](https://cloud.google.com/products)
 -   Explore the [Enterprise Setup Guide](https://docs.cloud.google.com/docs/enterprise/cloud-setup)
     for information on setting up Google Cloud for a team or organization.
+    A condensed walkthrough is in
+    [google-cloud-recipe-onboarding/google-cloud-setup.md](./google-cloud-recipe-onboarding/google-cloud-setup.md).
 -   Compare [AWS and Azure products to Google Cloud](https://docs.cloud.google.com/docs/get-started/aws-azure-gcp-service-comparison)
 
 ## Validation Logic

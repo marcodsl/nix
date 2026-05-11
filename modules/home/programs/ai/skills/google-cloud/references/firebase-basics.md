@@ -1,7 +1,3 @@
----
-name: firebase-basics
-description: Use this skill whenever you are working on a project that uses Firebase products or services, especially for mobile or web apps.
----
 
 # Firebase Basics
 
@@ -90,13 +86,13 @@ set up your environment:
 
 ## Reference directory
 
-- [Firebase core concepts](references/core-concepts.md)
-- [Firebase CLI usage](references/cli-usage.md)
-- [Firebase client library usage](references/client-library-usage.md)
-- [Firebase CLI and MCP server](references/mcp-usage.md)
-- [Firebase IaC usage](references/iac-usage.md)
-- [Firebase security-related features](references/iam-security.md)
-- [Additional Published Skills](references/additional-skills.md)
+- [Firebase core concepts](firebase-basics/core-concepts.md)
+- [Firebase CLI usage](firebase-basics/cli-usage.md)
+- [Firebase client library usage](firebase-basics/client-library-usage.md)
+- [Firebase CLI and MCP server](firebase-basics/mcp-usage.md)
+- [Firebase IaC usage](firebase-basics/iac-usage.md)
+- [Firebase security-related features](firebase-basics/iam-security.md)
+- [Additional Published Skills](firebase-basics/additional-skills.md)
 
 If you need product information that's not found in these references, check the
 other skills for Firebase that you have installed, or use the `search_documents`

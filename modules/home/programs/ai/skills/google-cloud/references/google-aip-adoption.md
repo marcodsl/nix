@@ -1,11 +1,3 @@
----
-name: google-aip-adoption
-description: "Design and review API contracts with Google AIP conventions. Use when: shaping resource models, choosing standard vs custom methods, defining field behavior, planning compatibility/versioning, or documenting exceptions."
-license: AGPL-3.0-only
-metadata:
-  author: marcodsl
-  tags: api-design, google-aip, contracts
----
 
 ## Google AIP Adoption
 

@@ -73,4 +73,4 @@ These have golden path defaults but customers may deviate with valid justificati
 
 ## Golden Path Config
 
-See [golden-path-autopilot.yaml](../assets/golden-path-autopilot.yaml) for the full cluster-level policy settings.
+See [golden-path-autopilot.yaml](./assets/golden-path-autopilot.yaml) for the full cluster-level policy settings.

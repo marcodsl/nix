@@ -35,7 +35,7 @@ kubectl autoscale deployment <DEPLOYMENT> --cpu-percent=50 --min=1 --max=10
 
 **Manifest approach (recommended — use MCP `apply_k8s_manifest`):**
 
-See [assets/hpa-example.yaml](../assets/hpa-example.yaml) for a template.
+See [assets/hpa-example.yaml](./assets/hpa-example.yaml) for a template.
 
 ```yaml
 apiVersion: autoscaling/v2
@@ -94,7 +94,7 @@ describe_k8s_resource(parent="...", resourceType="verticalpodautoscaler", name="
 kubectl get vpa <DEPLOYMENT>-vpa -o jsonpath='{.status.recommendation}'
 ```
 
-See [assets/vpa-example.yaml](../assets/vpa-example.yaml) for a full template.
+See [assets/vpa-example.yaml](./assets/vpa-example.yaml) for a full template.
 
 ### 4. Cluster Autoscaler / Node Auto Provisioning (NAP)
 
