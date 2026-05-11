@@ -52,7 +52,7 @@ actionlint .github/workflows/
 zizmor .github/workflows/
 ```
 
-See [templates/pre-commit-config.yaml](../templates/pre-commit-config.yaml) for a complete hook configuration.
+See [templates/pre-commit-config.yaml](./templates/pre-commit-config.yaml) for a complete hook configuration.
 
 ## Tool Matrix
 
@@ -236,7 +236,7 @@ uv run pip-audit --fix
 
 Automatically creates PRs for outdated dependencies.
 
-Copy [templates/dependabot.yml](../templates/dependabot.yml) to `.github/dependabot.yml`.
+Copy [templates/dependabot.yml](./templates/dependabot.yml) to `.github/dependabot.yml`.
 
 **How pip-audit and Dependabot work together:**
 

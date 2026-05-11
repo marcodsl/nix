@@ -1,12 +1,3 @@
----
-name: typescript-coding
-description: "Write and review TypeScript with strict verification and idiomatic design. Use when: writing, linting, formatting, testing, type-checking, reviewing, or refactoring TypeScript code with tsc, ESLint, Prettier, and Vitest."
-license: AGPL-3.0-only
-metadata:
-  author: marcodsl
-  tags: typescript, tsc, eslint, prettier, vitest, bun
----
-
 # TypeScript Coding
 
 Rules for TypeScript with strict verification, boundary validation, and idiomatic type design.
@@ -27,7 +18,7 @@ Use this skill to write, review, or refactor TypeScript. Prefer designs where `t
 ### Do not use this skill when
 
 - The task is mainly toolchain, editor, or CI setup.
-- React or Next.js framework rules are central. Use `react-guidelines` or `nextjs-guidelines` and apply this underneath.
+- React or Next.js framework rules are central. Use `react-guidelines` or `nextjs` and apply this underneath.
 
 ## Governing rule
 

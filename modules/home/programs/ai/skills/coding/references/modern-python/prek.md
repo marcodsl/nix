@@ -65,7 +65,7 @@ prek run ruff
 
 ## Configuration
 
-For a complete, copy-paste-ready configuration, see [templates/pre-commit-config.yaml](../templates/pre-commit-config.yaml).
+For a complete, copy-paste-ready configuration, see [templates/pre-commit-config.yaml](./templates/pre-commit-config.yaml).
 
 ### Recommended `.pre-commit-config.yaml`
 

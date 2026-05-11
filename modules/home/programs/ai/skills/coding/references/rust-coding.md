@@ -1,12 +1,3 @@
----
-name: rust-coding
-description: "Write and review Rust with strict verification and idiomatic design. Use when: writing, linting, testing, building, reviewing, or refactoring Rust code with cargo and Clippy."
-license: AGPL-3.0-only
-metadata:
-  author: marcodsl
-  tags: rust, cargo, clippy
----
-
 # Rust Coding
 
 Rules for Rust with strict verification, explicit safety boundaries, and idiomatic type design.

@@ -10,7 +10,7 @@
 
 ## Configuration
 
-Copy [templates/dependabot.yml](../templates/dependabot.yml) to `.github/dependabot.yml`.
+Copy [templates/dependabot.yml](./templates/dependabot.yml) to `.github/dependabot.yml`.
 
 The template includes:
 - Weekly update schedule for pip and GitHub Actions

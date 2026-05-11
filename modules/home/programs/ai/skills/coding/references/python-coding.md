@@ -1,12 +1,3 @@
----
-name: python-coding
-description: "Write and review Python with strict verification and idiomatic design. Use when: writing, linting, testing, formatting, type-checking, reviewing, or refactoring Python code with uv, ruff, mypy, and pytest."
-license: AGPL-3.0-only
-metadata:
-  author: marcodsl
-  tags: python, uv, ruff, mypy, pytest
----
-
 # Python Coding
 
 Rules for Python with strict verification, explicit type boundaries, and idiomatic API design.
