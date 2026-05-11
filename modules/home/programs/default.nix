@@ -3,6 +3,7 @@
     ./ai
 
     ./astral.nix
+    ./chromium-wayland.nix
     ./delta.nix
     ./direnv.nix
     ./firefox.nix
