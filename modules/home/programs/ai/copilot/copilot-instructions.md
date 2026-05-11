@@ -16,21 +16,19 @@ Skip only for purely mechanical requests such as raw command execution, echo-sty
 Use a local skill under `$HOME/.copilot/skills` when the request matches it:
 
 - `brainstorming`: ideation, alternatives, option-space expansion before design/planning.
+- `coding`: language-specific writing/review/refactor — Python (`uv`, `ruff`, `mypy`/`ty`, `pytest`, `pyproject`, project bootstrap), Rust (`cargo`, Clippy), TypeScript (`tsc`, ESLint, Prettier, Vitest, Bun).
 - `coding-guidelines`: architecture, design, reviews, refactor strategy, implementation tradeoffs, major technical decisions.
 - `context-map`: map files, dependencies, tests, references, ownership, scope, or blast radius before implementation.
 - `conventional-commits`: inspect diffs, choose commit type/scope, draft or create Conventional Commits.
 - `dockerfile`: create/review Dockerfiles, multi-stage builds, cache layers, base images, hardening, image size.
-- `google-aip-adoption`: resource models, standard/custom methods, field behavior, compatibility, versioning, AIP exceptions.
+- `google-cloud`: Google Cloud services (AlloyDB, BigQuery, Cloud SQL, Cloud Run, Firebase, GKE), Gemini API on Agent Platform, Google AIP API design, Google Cloud auth/IAM, networking observability, onboarding, Well-Architected Framework (cost, reliability, security).
 - `natural-tone`: docs, READMEs, technical notes, commit/PR prose, vague or formulaic text cleanup.
-- `nextjs-guidelines`: Next.js 16+ App Router, Server Components/Actions, Cache Components, PPR, routing, middleware, error boundaries.
+- `nextjs`: Next.js 16+ App Router — Server Components/Actions, Route Handlers, Cache Components, PPR, typedRoutes, middleware/proxy, error boundaries, file conventions, async APIs, hydration, Suspense, parallel routes, image/font/bundling, self-hosting.
 - `pressure-test`: challenge a proposal or design through focused assumption/tradeoff review.
 - `prompt-engineering`: system prompts, agent rules, instruction files, `SKILL.md`, `.agent.md`, `.prompt.md`, `.mdc`, coding-agent config.
-- `python-coding`: Python writing/review/refactor with `uv`, `ruff`, `mypy`, `pytest`.
 - `react-guidelines`: React 19+ components/hooks, server/client boundaries, compiler, Actions, Suspense, component tests.
 - `refactor-planning`: concrete refactor plans, RFC-style decisions, small safe commit breakdowns.
 - `rules-distill`: extract cross-cutting rules from multiple skills or promote repeated guidance.
-- `rust-coding`: Rust writing/review/refactor with `cargo` and Clippy.
-- `typescript-coding`: TypeScript writing/review/refactor with `tsc`, ESLint, Prettier, Vitest.
 
 ## Disambiguation
 

@@ -26,8 +26,8 @@ Use this skill to write, review, or refactor React components and hooks. Keep Se
 
 ### Do not use this skill when
 
-- The task is plain TypeScript with no React surface. Use `typescript-coding`.
-- Next.js App Router specifics are central. Use `nextjs-guidelines` and apply this underneath for component concerns.
+- The task is plain TypeScript with no React surface. Use the `coding` skill (TypeScript branch).
+- Next.js App Router specifics are central. Use `nextjs` and apply this underneath for component concerns.
 - The task is mainly toolchain, editor, or CI setup.
 
 ## Governing rule
@@ -37,7 +37,7 @@ Server Components by default, `'use client'` at the smallest interactive leaf, l
 ## Verification defaults
 
 - Use the project's existing package manager; prefer Bun only for greenfield.
-- Type-check: inherit `typescript-coding` defaults. React 19 should use the new JSX transform; no `import React from "react"` for JSX.
+- Type-check: inherit the TypeScript branch of the `coding` skill. React 19 should use the new JSX transform; no `import React from "react"` for JSX.
 - Lint: `eslint .` with `eslint-plugin-react`, `eslint-plugin-react-hooks`, `eslint-plugin-jsx-a11y`, and `eslint-plugin-react-compiler` when the compiler is enabled.
 - Component tests: `vitest run` with `jsdom` or `happy-dom`, `@testing-library/react`, and `@testing-library/user-event`. Prefer Vitest over `bun test` for browser-like tests.
 - E2E: `playwright test` against the real build or dev server; reserve it for flows crossing component or route boundaries.
