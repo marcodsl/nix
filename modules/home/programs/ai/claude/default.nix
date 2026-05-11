@@ -35,8 +35,20 @@ in {
     context = ./CLAUDE.md;
 
     settings = {
-      includeCoAuthoredBy = false;
       theme = "dark";
+
+      attribution = {
+        commit = "";
+        pr = "";
+      };
+
+      showThinkingSummaries = true;
+      skillListingBudgetFraction = 0.03;
+
+      spinnerTipsEnabled = false;
+      includeGitInstructions = false;
+      cleanupPeriodDays = 90;
+
       enabledMcpjsonServers = lib.attrNames config.programs.mcp.servers;
       hooks.Stop = [
         {
