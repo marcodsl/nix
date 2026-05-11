@@ -1,12 +1,3 @@
----
-name: nextjs-guidelines
-description: "Write and review Next.js 16+ App Router code with strict verification and idiomatic design. Use when: writing or reviewing Server Components, Server Actions, Route Handlers, Cache Components (use cache), PPR, typedRoutes, middleware, error.tsx, and route-level patterns with Vitest and Playwright."
-license: AGPL-3.0-only
-metadata:
-  author: marcodsl
-  tags: nextjs, app-router, cache-components, server-actions, ppr, vitest, playwright
----
-
 # Next.js Guidelines
 
 Rules for Next.js 16+ App Router code with strict verification, explicit caching boundaries, and idiomatic routes/actions.
@@ -26,7 +17,7 @@ Use this skill to write, review, or refactor App Router applications. Keep Serve
 
 ### Do not use this skill when
 
-- The task is plain TypeScript with no Next.js surface. Use `typescript-coding`.
+- The task is plain TypeScript with no Next.js surface. Use the `coding` skill (TypeScript branch).
 - The task is React primitives without App Router concerns. Use `react-guidelines` and apply this on top.
 - The repo is legacy Pages Router only and migration is out of scope.
 - The task is mainly toolchain, editor, or CI setup.
@@ -38,7 +29,7 @@ App Router first, Server Components by default, `"use cache"` only where caching
 ## Verification defaults
 
 - Use the project manager from the lockfile. Prefer Bun only for greenfield; honor existing Next.js monorepo managers.
-- Type-check: inherit `typescript-coding` defaults and enable `typedRoutes`.
+- Type-check: inherit the TypeScript branch of the `coding` skill and enable `typedRoutes`.
 - Lint: `next lint` or `eslint .` with `eslint-config-next`; keep `@next/next/core-web-vitals` on.
 - Build: `next build`; it catches server/client boundary crossings, unused route segments, and dynamic APIs under `"use cache"`.
 - Unit/component tests: `vitest run`; inherit placement and Testing Library guidance from `react-guidelines`.
