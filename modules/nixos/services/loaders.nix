@@ -28,6 +28,31 @@
     mesa
   ];
 
+  # Runtime deps for unpatched Chromium/Chrome-for-Testing binaries (e.g.
+  # downloaded by `playwright install chromium`). Mirrors the libs nixpkgs
+  # `playwright-driver.browsers` patches into its own chromium build.
+  chromiumCompatibilityLibraries = with pkgs; [
+    alsa-lib
+    at-spi2-atk
+    at-spi2-core
+    atk
+    cairo
+    cups
+    dbus
+    expat
+    fontconfig
+    freetype
+    gdk-pixbuf
+    gtk3
+    libnotify
+    libpulseaudio
+    libuuid
+    libxkbcommon
+    nspr
+    nss
+    pango
+  ];
+
   steamInspiredLibraries = with pkgs; [
     # Inspired by Steam:
     # https://github.com/NixOS/nixpkgs/blob/master/pkgs/by-name/st/steam/package.nix
@@ -83,6 +108,7 @@
     graphicalCompatibilityLibraries
     ++ requiredRuntimeLibraries
     ++ steamInspiredLibraries
+    ++ chromiumCompatibilityLibraries
     ++ fragileAppImageCompatibilityLibraries
   );
 in {

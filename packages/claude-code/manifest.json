@@ -1,0 +1,17 @@
+{
+  "version": "2.1.138",
+  "platforms": {
+    "linux-x64": {
+      "checksum": "1hzqym4r1m1q1j6p3qd96l62bvb1cgzck1rnqd06xw9cq7xnzif3"
+    },
+    "linux-arm64": {
+      "checksum": "0wc6z41dy348zv6mz4kpnasymkd55jcbv108cvp8zmb23ajcqgk9"
+    },
+    "darwin-x64": {
+      "checksum": "0m2g0400khh5p2l02mprbkz4gvmhj63ys4bbj11ik133zmx3m7fr"
+    },
+    "darwin-arm64": {
+      "checksum": "15s0fy49j4fdwi1y2kjh5sf3pqx9m1n5qp5kr2dwi4v1cb7277bm"
+    }
+  }
+}
