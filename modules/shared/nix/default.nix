@@ -1,6 +1,7 @@
 {
   flake,
   lib,
+  pkgs,
   ...
 }: let
   inherit (flake.inputs) self;
@@ -11,6 +12,8 @@ in {
   };
 
   nix = {
+    package = pkgs.lix;
+
     nixPath = [
       "nixpkgs=${flake.inputs.nixpkgs}"
     ];
@@ -63,7 +66,6 @@ in {
 
       connect-timeout = 10;
       download-attempts = 10;
-      download-buffer-size = 512 * mib;
       http-connections = 50;
       keep-going = true;
       max-call-depth = "1000000";
@@ -72,6 +74,7 @@ in {
       max-substitution-jobs = 32;
       narinfo-cache-negative-ttl = 300;
       narinfo-cache-positive-ttl = 432000;
+      builders-use-substitutes = true;
       stalled-download-timeout = 60;
       use-cgroups = true;
 
