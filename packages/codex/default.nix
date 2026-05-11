@@ -16,7 +16,7 @@
   nativeBinName ? "codex",
   nodeBinName ? "codex-node",
 }: let
-  version = "0.128.0";
+  version = "0.130.0";
 
   releaseUrl = "https://github.com/openai/codex/releases/download/rust-v${version}";
   npmUrl = "https://registry.npmjs.org/@openai/codex/-/codex-${version}.tgz";
@@ -47,15 +47,15 @@
   supportedSystems = lib.attrNames platformsBySystem;
 
   nativeHashes = {
-    "aarch64-apple-darwin" = "1mgkm93msm1x938zqpqzyrb7pfihrny03106ih629349i8p20s7h";
-    "x86_64-unknown-linux-musl" = "0fp243xswx5fsgh00g8h7fji2dljprzh1jip8hil62wc27k8asw8";
-    "aarch64-unknown-linux-musl" = "1l6blqxsl00ashvfzqx73gil1vm7z4dv9z5hzfzggsjg63av8q9i";
+    "aarch64-apple-darwin" = "0xrmfg76n90cvi3ibqkh0y1hf4b0kdjy92ci2ycwmj50z6vs8l5w";
+    "x86_64-unknown-linux-musl" = "140ihs7rnj09kc5dfvll4gn3dhzfhkhd9mrni9v8ll2pg1xrwxqn";
+    "aarch64-unknown-linux-musl" = "0ry7j9j2b0pym9mvq0991slj5c27140n275ppjsicc1cqbr00zhx";
   };
 
   nodeOptionalDepHashes = {
-    "darwin-arm64" = "16wx35sd6lvyy337gxa5rvbs2q0sd077a4ihs5y333g1gaarsj95";
-    "linux-x64" = "0y2khg9nd9g9rqfbyg7h4qrni2d72m6c48ndg5w3xxpjd97hn5i1";
-    "linux-arm64" = "1bv5aylp4218n6194vgf6532y2ff42vwln3x6fxhjk549dlzm1x3";
+    "darwin-arm64" = "0bdijqhm2vidlfhimv5lwqs7jw622i66nadksfd0fxw9xv7g5zpn";
+    "linux-x64" = "13xa09rj49gakjx70v8rpkbbc5fmlg7i2a64qn32qw4wqib2mqci";
+    "linux-arm64" = "1ppkv0imi4ydbqrwsm37bi1pwlsknin0agm8sw7nyg78mdh7489z";
   };
 
   fetchReleaseTarball = fileName: sha256:
@@ -74,7 +74,7 @@
     then
       fetchurl {
         url = npmUrl;
-        sha256 = "1y7r47p3nhf1kxlrnvjhrrnnv12r9p2jix0p771s4zlkfs1x6vs9";
+        sha256 = "1jigciqpx1xvnd2fj80xiz6vqsjxw1jakp2hrszvq00qilkczzy3";
       }
     else null;
 
