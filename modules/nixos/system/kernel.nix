@@ -35,8 +35,8 @@ in {
           vfs_cache_pressure = 50;
           dirty_ratio = 10;
           dirty_background_ratio = 5;
-          swappiness = 100;
-          "page-cluster" = 1;
+          swappiness = 180;
+          "page-cluster" = 0;
           watermark_boost_factor = 0;
           watermark_scale_factor = 125;
         };

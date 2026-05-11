@@ -16,7 +16,6 @@
 
   boot.initrd.luks.devices = {
     "luks-f7465fe9-f37a-4df2-bf23-def022d3a801".device = "/dev/disk/by-uuid/f7465fe9-f37a-4df2-bf23-def022d3a801";
-    "luks-8c82790b-f0b1-4924-9bf2-a33144b6b1b5".device = "/dev/disk/by-uuid/8c82790b-f0b1-4924-9bf2-a33144b6b1b5";
   };
 
   fileSystems."/boot" = {
@@ -25,9 +24,7 @@
     options = ["fmask=0077" "dmask=0077"];
   };
 
-  swapDevices = [
-    {device = "/dev/mapper/luks-8c82790b-f0b1-4924-9bf2-a33144b6b1b5";}
-  ];
+  swapDevices = [];
 
   services = {
     fstrim.enable = true;

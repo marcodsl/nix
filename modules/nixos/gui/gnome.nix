@@ -19,7 +19,7 @@
 in {
   config = lib.mkIf config.services.desktopManager.gnome.enable {
     services.dbus.packages = with pkgs; [gnome2.GConf];
-    services.sysprof.enable = lib.mkDefault true;
+    services.sysprof.enable = false;
 
     services.gnome = {
       evolution-data-server.enable = lib.mkForce false;
@@ -39,6 +39,11 @@ in {
     ];
 
     environment.systemPackages = systemPackages;
+
+    systemd.user.services."org.gnome.Shell@wayland" = {
+      overrideStrategy = "asDropin";
+      serviceConfig.OOMScoreAdjust = -500;
+    };
 
     programs.dconf = {
       enable = lib.mkDefault true;

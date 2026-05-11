@@ -15,10 +15,20 @@
         enable = lib.mkDefault true;
         enableUserSlices = lib.mkDefault true;
         enableRootSlice = lib.mkDefault true;
+        enableSystemSlice = lib.mkDefault true;
         settings.OOM = {
-          DefaultMemoryPressureDurationSec = "20s";
+          DefaultMemoryPressureDurationSec = "5s";
+          DefaultMemoryPressureLimit = "60%";
+          SwapUsedLimit = "90%";
         };
       };
+    };
+
+    services.earlyoom = {
+      enable = lib.mkDefault true;
+      freeMemThreshold = 5;
+      freeSwapThreshold = 10;
+      enableNotifications = false;
     };
   };
 }
