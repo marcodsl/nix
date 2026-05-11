@@ -49,13 +49,13 @@ Decide which surviving findings qualify for the apply plan. Use your judgment �
 
 **Default heuristics** to apply unless you have a specific reason to deviate (and document the deviation in `qualification_rationale`):
 
-- A `critical` finding qualifies even with one agent.
+- A `high` or `critical` finding qualifies even with one agent.
 - A finding with ≥2 distinct personas flagging the same bucket qualifies regardless of severity.
 - A `test-coverage` finding ≥ `medium` qualifies as a single-source addition.
 - A `simplicity` finding < `medium` does NOT qualify alone.
 - A `low`-severity finding from a single agent does NOT qualify.
 
-For each qualifying finding, attach a one-line `qualification_rationale` (e.g., `"critical security single-agent"` or `"2-persona agreement: security+type-correctness"` or `"single-source test-coverage, severity=high"`).
+For each qualifying finding, attach a one-line `qualification_rationale` (e.g., `"high/critical security single-agent"` or `"2-persona agreement: security+type-correctness"` or `"single-source test-coverage, severity=high"`).
 
 For each disqualified finding, record it in `deferred[]` with reason `not-enough-consensus`.
 
@@ -77,6 +77,7 @@ Build groups so that two patches share a group iff their touched-file sets overl
 **Within each group**: order patches by ascending `start_line` of the patch's first hunk. Why: patching bottom-up would shift earlier line numbers; ascending-line application keeps subsequent hunk offsets valid.
 
 **Across groups**: order by:
+
 1. Maximum severity in the group, descending (`critical` > `high` > `medium` > `low`).
 2. Total agreement count across the group's findings, descending.
 3. File-set size, ascending (smaller, less-coupled groups first — limits blast radius if a later large group fails tests).
@@ -85,7 +86,7 @@ Build groups so that two patches share a group iff their touched-file sets overl
 
 For each group, scan its patches for identifiers that look like exported symbols being removed or renamed (e.g., a hunk deleting `export function foo`, `pub fn foo`, `def foo`, etc.). For each such identifier:
 
-- `Grep` for the identifier across all `touched_files` *not* in the current group's file set, and across the broader repo if reasonable.
+- `Grep` for the identifier across all `touched_files` _not_ in the current group's file set, and across the broader repo if reasonable.
 - If the identifier is referenced outside the group's file set, set `cross_file_impact: true` on the group and move it to `deferred[]` with reason `cross-file-impact`. The orchestrator will not apply it; the user can review the cross-file rename separately.
 
 This heuristic is intentionally conservative. False positives (deferring a safe patch) are cheaper than false negatives (landing a half-rename).

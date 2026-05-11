@@ -1,5 +1,5 @@
 ---
-description: Multi-agent consensus code review with auto-applied patches gated by tests
+description: Multi-agent code review with auto-applied patches gated by tests
 argument-hint: [--base <ref>] [--range A..B] [--staged | --working]
 ---
 
@@ -32,23 +32,23 @@ Run these in order. First failure aborts unless noted.
      2. `git symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null`
      3. `git show-ref --verify --quiet refs/remotes/origin/main && echo origin/main`
      4. `git show-ref --verify --quiet refs/remotes/origin/master && echo origin/master`
-     If none resolve → abort with: "no base ref inferable; pass `--base <ref>` or `--range A..B`."
-     Else → `BASE=<resolved>`; `RANGE="$(git merge-base HEAD $BASE)..HEAD"`.
+        If none resolve → abort with: "no base ref inferable; pass `--base <ref>` or `--range A..B`."
+        Else → `BASE=<resolved>`; `RANGE="$(git merge-base HEAD $BASE)..HEAD"`.
 
 3. **Clean-tree check** (skipped under `--working`; relaxed under `--staged`):
    - Default mode: `git status --porcelain` must be empty. If non-empty, list dirty files and ask the user `[stash | abort | continue-unsafe]`. Wait for an answer.
      - `stash` → `git stash push -u -m "consensus-review-preflight"` and remember to `git stash pop` at the end (announce this in the final report).
      - `abort` → stop.
      - `continue-unsafe` → proceed; warn that rollback may not cleanly distinguish reviewer hunks from pre-existing dirt.
-   - `--staged` mode: confirm there are no unstaged modifications to files that are *also* staged (`git diff --name-only` ∩ `git diff --cached --name-only` must be empty). If violated, abort with: "files have both staged and unstaged changes; commit or stash unstaged hunks first."
+   - `--staged` mode: confirm there are no unstaged modifications to files that are _also_ staged (`git diff --name-only` ∩ `git diff --cached --name-only` must be empty). If violated, abort with: "files have both staged and unstaged changes; commit or stash unstaged hunks first."
 
 4. **Capture diff**:
    - Default / `--base` / `--range`: `git diff --no-color --no-ext-diff $RANGE > /tmp/consensus-review-diff.patch`.
    - `--staged`: `git diff --cached --no-color --no-ext-diff > /tmp/consensus-review-diff.patch`.
    - `--working`: `git diff HEAD --no-color --no-ext-diff > /tmp/consensus-review-diff.patch`.
-   Set `DIFF_PATH=/tmp/consensus-review-diff.patch`.
-   Compute `TOUCHED_FILES`: `git diff --name-only $RANGE` (or `--cached` / vs `HEAD` per mode).
-   If the diff is empty (`! [ -s "$DIFF_PATH" ]`) → abort with: "no changes to review."
+     Set `DIFF_PATH=/tmp/consensus-review-diff.patch`.
+     Compute `TOUCHED_FILES`: `git diff --name-only $RANGE` (or `--cached` / vs `HEAD` per mode).
+     If the diff is empty (`! [ -s "$DIFF_PATH" ]`) → abort with: "no changes to review."
 
 5. **Detect test command** (pick the **first** match):
    - `flake.nix` present → `nix flake check`. Per repo CLAUDE.md: if existing scripts or commits show `--no-pure-eval` is used, preserve it.
@@ -140,34 +140,43 @@ Never use `--no-verify`, `--force`, `--no-gpg-sign`, or skip tests.
 Produce a markdown report with these sections, in order:
 
 ### Run summary
+
 - Range reviewed (`RANGE` or equivalent).
 - Mode (default / `--staged` / `--working`).
 - Test command + baseline duration.
 - Reviewers that succeeded vs. failed.
 
 ### Agreement matrix
+
 Table from `APPLY_PLAN.agreement_matrix`: rows = unique buckets (`file:line`), columns = the 5 personas, cells = severity flagged or `—`. Sort by descending agent count, then descending max severity.
 
 ### Applied
+
 For each landed group: `group_id`, files, agents who flagged, severity, one-line description per patch, and the synthesizer's `qualification_rationale`.
 
 ### Rejected (synthesizer)
+
 - **Ungrounded** (from `rejected_ungrounded[]`): one row per finding, with citation, what was actually at the cited range, and the persona that produced it.
 
 ### Rejected (orchestrator)
+
 - **Apply-fail**: groups that failed `git apply --check` against their target state.
 
 ### Deferred
+
 - From `deferred[]`: per-group, with reason (`intra-group-conflict` | `cross-file-impact` | `not-enough-consensus`).
 - From Phase 3: per-group, reason `test-fail`, with a 20-line test-output excerpt.
 
 ### Failed reviewers
+
 List from `agent_failed[]` if any. Note that their findings are absent from the consensus.
 
 ### Final diff
+
 Run `git diff $BASE_SHA..HEAD` (or `git diff` if you didn't commit anything, which is the expected case) and include the full diff verbatim.
 
 ### Next step
+
 > Review the diff above. Reply `commit` to commit it, or name hunks to drop. **Stop.** Do not commit.
 
 If you stashed in Phase 0, remind the user to `git stash pop` after they decide.
