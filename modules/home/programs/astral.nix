@@ -3,9 +3,12 @@
   programs = {
     uv = {
       enable = true;
+      # Python comes from devshells only - uv must not fetch or install its own.
       settings = {
         python-downloads = "never";
         python-preference = "only-system";
+        link-mode = "hardlink";
+        compile-bytecode = true;
       };
     };
 
