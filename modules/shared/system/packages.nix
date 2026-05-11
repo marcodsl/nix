@@ -18,8 +18,10 @@
     fd
     just
     jq
+    unzip
     ripgrep
     rsync
+    zip
     vim
     wget
 
