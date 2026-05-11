@@ -8,6 +8,7 @@
     ./ollama.nix
     ./podman.nix
     ./tailscale.nix
+    ./vector.nix
     ./vmware.nix
   ];
 

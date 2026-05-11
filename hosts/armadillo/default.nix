@@ -67,6 +67,7 @@ in {
       mullvad.enable = true;
       ollama.enable = false;
       tailscale.enable = true;
+      vector.enable = true;
       vmware.enable = false;
     };
   };

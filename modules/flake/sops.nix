@@ -15,6 +15,9 @@ in {
         "ollama/api_key" = {};
         "github/token" = {};
 
+        "betterstack/source_token" = {};
+        "betterstack/ingesting_host" = {};
+
         "networkmanager/wifi_profile" = {
           mode = "0400";
           restartUnits = ["networkmanager-static-wifi.service"];
@@ -35,6 +38,14 @@ in {
         "ollama.env" = {
           content = ''
             OLLAMA_API_KEY=${config.sops.placeholder."ollama/api_key"}
+          '';
+          mode = "0440";
+        };
+
+        "vector.env" = {
+          content = ''
+            BETTERSTACK_SOURCE_TOKEN=${config.sops.placeholder."betterstack/source_token"}
+            BETTERSTACK_INGESTING_HOST=${config.sops.placeholder."betterstack/ingesting_host"}
           '';
           mode = "0440";
         };
