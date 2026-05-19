@@ -20,6 +20,7 @@
       mnemonicprefix = true;
       colorMoved = "zebra";
       colorMovedWS = "allow-indentation-change";
+      tool = "vimdiff";
     };
 
     branch = {
@@ -61,7 +62,19 @@
     merge = {
       conflictStyle = "zdiff3";
       stat = true;
+      tool = "vimdiff";
+      renormalize = true;
+      directoryRenames = "true";
     };
+
+    mergetool = {
+      prompt = false;
+      keepBackup = false;
+    };
+
+    difftool.prompt = false;
+
+    apply.whitespace = "fix";
 
     rebase = {
       autoSquash = true;
