@@ -34,7 +34,7 @@
     value = rootPath + "/${name}";
   };
 
-  generatedModulePaths = builtins.listToAttrs (lib.mapAttrsToList mkModulePathAttr moduleEntries);
+  generatedModulePaths = lib.mapAttrs' mkModulePathAttr moduleEntries;
 in
   if duplicateAttrNames != []
   then throw "module path collision under ${toString rootPath}: ${lib.concatStringsSep ", " duplicateAttrNames}"

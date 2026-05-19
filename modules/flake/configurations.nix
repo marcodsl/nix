@@ -4,7 +4,7 @@
   self,
   ...
 }: let
-  flakeArgs = import ./internal/mk-flake-args.nix {inherit inputs self;};
+  flakeArgs = {flake = {inherit inputs self;};};
   homeManagerLib = inputs.home-manager.lib;
   userHomeModule = username: "${self}/users/${username}/home.nix";
   defaultHomePkgs = import inputs.nixpkgs {
