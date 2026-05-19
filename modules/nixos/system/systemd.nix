@@ -11,24 +11,27 @@
         DefaultDeviceTimeoutSec = lib.mkDefault "10s";
       };
 
-      oomd = {
-        enable = lib.mkDefault true;
-        enableUserSlices = lib.mkDefault true;
-        enableRootSlice = lib.mkDefault true;
-        enableSystemSlice = lib.mkDefault true;
-        settings.OOM = {
-          DefaultMemoryPressureDurationSec = "5s";
-          DefaultMemoryPressureLimit = "60%";
-          SwapUsedLimit = "90%";
-        };
-      };
+      # earlyoom (below) is the sole OOM killer; oomd's SwapUsedLimit
+      # misfires on zram occupancy.
+      oomd.enable = false;
     };
+
+    # jitterentropy-rngd 1.3.1 calls mlock(2), which the upstream unit's
+    # seccomp filter denies → SIGSYS at startup. RDRAND covers entropy on
+    # this host; disabling avoids a failed unit on every activation.
+    services.jitterentropy-rngd.enable = false;
 
     services.earlyoom = {
       enable = lib.mkDefault true;
       freeMemThreshold = 5;
       freeSwapThreshold = 10;
       enableNotifications = false;
+      extraArgs = [
+        "--avoid"
+        "^(gnome-shell|gnome-session|gsd-|gdm|dbus-broker|pipewire|wireplumber|Xwayland|gnome-keyring|gcr-|gvfsd)"
+        "--prefer"
+        "^(electron|chromium|chrome|firefox|node)"
+      ];
     };
   };
 }
