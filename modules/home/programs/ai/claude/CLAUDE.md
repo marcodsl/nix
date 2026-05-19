@@ -62,6 +62,11 @@ For multi-step tasks, state a brief plan:
 Why this matters: strong success criteria let you loop independently. Weak criteria ("make it work") require constant clarification.
 </principle>
 
+<section name="Execution Style">
+- Don't auto-start dev servers or long-running services — print the command for the user to run
+- When given an orchestrator/research-only role, stay in that role across continuations; if direct edits seem needed, surface the proposal and wait
+</section>
+
 <section name="Development environment">
 When `devenv.nix` does not exist in the project you are working in and a command or tool is missing, create an ad-hoc shell:
 
@@ -89,7 +94,21 @@ Use these when the task calls for it:
 - Don't trust reviewer claims that flags are no-ops without verifying
 </section>
 
+<section name="Git & Commits">
+- Before committing, check `git status` and `git diff --staged`; never bundle pre-staged unrelated files
+- Use Conventional Commits; one logical change per commit
+</section>
+
+<section name="Security Reviews">
+- For security/code reviews, run the project's verification commands (lint, type-check, tests) before reporting completion
+- When a reviewer/agent proposes a patch, verify the referenced lines exist before applying — guard against hallucinated diffs
+</section>
+
 <section name="Python Code Quality">
 - Run lint (Ruff) and type checks proactively after Python edits, not after the user asks
 - Avoid `NoReturn` annotations on FastAPI handlers — they break response-model inference
+</section>
+
+<section name="Prose Style">
+- Never use em dashes (—) in any written output. Replace with a period, a comma, or a restructured sentence.
 </section>
