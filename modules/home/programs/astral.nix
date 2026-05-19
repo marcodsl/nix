@@ -9,6 +9,7 @@
         python-preference = "only-system";
         link-mode = "hardlink";
         compile-bytecode = true;
+        exclude-newer = "P7D";
       };
     };
 
