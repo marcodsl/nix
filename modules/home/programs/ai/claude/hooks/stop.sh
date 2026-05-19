@@ -33,6 +33,14 @@ if grep -qE '\.nix$' <<<"$edited"; then
   fi
 fi
 
+while IFS= read -r f; do
+  [[ "$f" == */SKILL.md || "$f" == SKILL.md ]] || continue
+  [[ -f "$f" ]] || continue
+  if ! skills-ref validate "$f" >&2; then
+    messages+=("skills-ref validate failed for $f - see stderr above")
+  fi
+done <<<"$edited"
+
 if (( ${#messages[@]} > 0 )); then
   printf -v joined '%s\n' "${messages[@]}"
   jq -nc --arg msg "$joined" '{systemMessage: $msg}'
