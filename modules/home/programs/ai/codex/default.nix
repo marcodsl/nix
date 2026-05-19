@@ -1,5 +1,6 @@
 {
   config,
+  flake,
   lib,
   pkgs,
   ...
@@ -21,20 +22,20 @@
       enabled = !(server.disabled or false);
     };
 
-  mcpEnabled =
-    (config.programs.mcp.enable or false)
-    && (config.programs.mcp.servers or {}) != {};
-
-  generatedMcpServers =
-    optionalAttrs mcpEnabled
+  transformedMcpServers =
+    optionalAttrs (cfg.enableMcpIntegration && config.programs.mcp.enable)
     (mapAttrs mkMcpServer config.programs.mcp.servers);
 
+  settingMcpServers = cfg.settings.mcp_servers or {};
+  mergedMcpServers = transformedMcpServers // settingMcpServers;
+
   # Match the upstream module's `mergedSettings`: user-provided
-  # `programs.codex.settings` plus the auto-generated MCP servers.
+  # `programs.codex.settings` plus auto-generated MCP servers, with
+  # settings-defined servers taking precedence over transformed shared ones.
   nixManagedConfig =
-    (cfg.settings or {})
-    // optionalAttrs (generatedMcpServers != {}) {
-      mcp_servers = generatedMcpServers;
+    cfg.settings
+    // optionalAttrs (mergedMcpServers != {}) {
+      mcp_servers = mergedMcpServers;
     };
 
   nixStateFile = tomlFormat.generate "codex-nix-state.toml" nixManagedConfig;
@@ -53,53 +54,13 @@
 
   # Three-way merge at top-level granularity: apply current Nix keys, drop
   # keys the previous snapshot owned but the new one doesn't, leave the rest
-  # alone so Codex's runtime writes (theme, app state, …) survive activation.
-  mergeScript =
-    pkgs.writers.writePython3Bin "codex-config-merge" {
-      libraries = [pkgs.python3Packages.tomli-w];
-      flakeIgnore = ["E501"];
-    } ''
-      import os
-      import sys
-      import tomllib
-      import tomli_w
-      from pathlib import Path
-
-      nix_state_path, prev_state_path, user_path = (
-          Path(p) for p in sys.argv[1:4]
-      )
-
-
-      def load_toml(p):
-          if not p.exists():
-              return {}
-          return tomllib.loads(p.read_text())
-
-
-      def write_toml(p, data):
-          if p.is_symlink():
-              p.unlink()
-          p.parent.mkdir(parents=True, exist_ok=True)
-          tmp = p.with_name(p.name + ".tmp")
-          tmp.write_text(tomli_w.dumps(data))
-          os.replace(tmp, p)
-
-
-      nix_state = load_toml(nix_state_path)
-      prev_state = load_toml(prev_state_path)
-      user_config = load_toml(user_path)
-
-      # Apply: every key Nix currently manages.
-      for key, value in nix_state.items():
-          user_config[key] = value
-
-      # Remove: keys Nix used to manage but no longer does.
-      for key in set(prev_state) - set(nix_state):
-          user_config.pop(key, None)
-
-      write_toml(user_path, user_config)
-      write_toml(prev_state_path, nix_state)
-    '';
+  # alone so Codex's runtime writes (theme, app state, ...) survive
+  # activation.
+  mergeScript = flake.self.lib.mkSettingsMerge pkgs {
+    name = "codex-config-merge";
+    format = "toml";
+    deep = false;
+  };
 in {
   home.packages = [pkgs.codex];
 
@@ -121,8 +82,8 @@ in {
 
   home.activation.mergeCodexConfig = lib.hm.dag.entryAfter ["writeBoundary"] ''
     $DRY_RUN_CMD ${getExe mergeScript} \
-      ${nixStateFile} \
-      ${escapeShellArg prevStatePath} \
-      ${escapeShellArg userConfigPath}
+      --state ${nixStateFile} \
+      --prev-state ${escapeShellArg prevStatePath} \
+      --user ${escapeShellArg userConfigPath}
   '';
 }
