@@ -2,6 +2,7 @@
   config,
   flake,
   lib,
+  pkgs,
   ...
 }: let
   inherit (flake) inputs;
@@ -61,14 +62,23 @@ in {
       dns = "1.1.1.1 1.0.0.1";
     };
 
-    services = {
-      caddy.enable = true;
-      deskflow.enable = true;
-      mullvad.enable = true;
-      ollama.enable = false;
-      tailscale.enable = true;
-      vector.enable = true;
-      vmware.enable = false;
-    };
+    services =
+      {
+        caddy.enable = true;
+        cloudflared.enable = true;
+        deskflow.enable = true;
+        litellm.enable = true;
+        mullvad.enable = true;
+        ollama.enable = false;
+        tailscale.enable = true;
+        vector.enable = true;
+        vmware.enable = false;
+      }
+      // lib.optionalAttrs (self.packages.${pkgs.stdenv.hostPlatform.system} ? falcon-sensor) {
+        falcon-sensor = {
+          enable = true;
+          package = self.packages.${pkgs.stdenv.hostPlatform.system}.falcon-sensor;
+        };
+      };
   };
 }
