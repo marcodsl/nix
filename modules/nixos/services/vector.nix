@@ -5,6 +5,46 @@
   ...
 }: let
   cfg = config.marco.services.vector;
+  noisePredicates = [
+    {
+      name = "is_webview_preload";
+      expr = ''unit == "user@1000.service" && contains(msg, "preloaded using link preload but not used")'';
+    }
+    {
+      name = "is_osk_warn";
+      expr = ''unit == "user@1000.service" && contains(msg, "failed to activate the on-screen keyboard")'';
+    }
+    {
+      name = "is_tailscale_chatter";
+      expr = ''unit == "tailscaled.service" && level == "info" && (starts_with(msg, "magicsock: ") || starts_with(msg, "derphttp.Client.Recv"))'';
+    }
+    {
+      name = "is_user_session_noise";
+      expr = ''starts_with(unit, "user@") && (contains(msg, "has been already disposed") || contains(msg, "leaked proxy"))'';
+    }
+    {
+      name = "is_tracker_unknown_method";
+      expr = ''contains(msg, "/org/freedesktop/Tracker3/Extract") && contains(msg, "UnknownMethod")'';
+    }
+    {
+      name = "is_localsearch_no_conn";
+      expr = ''msg == "Localsearch search engine has no connection"'';
+    }
+    {
+      name = "is_calendar_failed";
+      expr = ''contains(unit, "org.gnome.Calendar") && contains(msg, "Failed with result")'';
+    }
+    {
+      name = "is_hibernate_keybind";
+      expr = ''msg == "Failed to grab accelerator for keybinding settings:hibernate"'';
+    }
+  ];
+  noisePredicateAssignments =
+    lib.concatMapStringsSep "\n"
+    (predicate: "${predicate.name} = ${predicate.expr}")
+    noisePredicates;
+  noisePredicateExpression =
+    lib.concatMapStringsSep " || " (predicate: predicate.name) noisePredicates;
 in {
   options.marco.services.vector.enable =
     lib.mkEnableOption "BetterStack Vector log and host-metric shipping";
@@ -27,7 +67,7 @@ in {
 
           host_metrics = {
             type = "host_metrics";
-            scrape_interval_secs = 120;
+            scrape_interval_secs = 15;
             collectors = ["cpu" "disk" "filesystem" "host" "load" "memory" "network"];
             filesystem.mountpoints.excludes = ["/run/user/*/*"];
           };
@@ -89,8 +129,8 @@ in {
             '';
           };
 
-          # Drop known unit/message patterns that dominate journal volume
-          # without operational value.
+          # Drop unit/message patterns that dominate journal volume without
+          # operational value.
           filter_noise = {
             type = "filter";
             inputs = ["enrich_journald"];
@@ -99,11 +139,9 @@ in {
               msg = to_string(.message) ?? ""
               level = to_string(.level) ?? ""
 
-              is_webview_preload = unit == "user@1000.service" && contains(msg, "preloaded using link preload but not used")
-              is_osk_warn = unit == "user@1000.service" && contains(msg, "failed to activate the on-screen keyboard")
-              is_tailscale_chatter = unit == "tailscaled.service" && level == "info" && (starts_with(msg, "magicsock: ") || starts_with(msg, "derphttp.Client.Recv"))
+              ${noisePredicateAssignments}
 
-              !(is_webview_preload || is_osk_warn || is_tailscale_chatter)
+              !(${noisePredicateExpression})
             '';
           };
 
@@ -152,7 +190,14 @@ in {
       };
     };
 
-    systemd.services.vector.serviceConfig.EnvironmentFile =
-      config.sops.templates."vector.env".path;
+    systemd.services.vector.serviceConfig = {
+      EnvironmentFile = config.sops.templates."vector.env".path;
+      MemoryHigh = "192M";
+      MemoryMax = "384M";
+      Restart = "always";
+      RestartSec = "5s";
+      RestartSteps = 5;
+      RestartMaxDelaySec = "60s";
+    };
   };
 }
