@@ -11,13 +11,18 @@ result
 devenv.local.nix
 devenv.local.yaml
 
-# Burp Suite Pro (licensed and borderline illegally tweaked)
+# Vendored
 packages/burp-suite-pro/*
-!packages/burp-suite-pro/.gitkeep
+packages/falcon-sensor/*
+!packages/**/.gitkeep
+
+
 
 # AI tools
+.claude/
 .copilot-memory/
 .codex
+CLAUDE.md
 
 # Python bytecode caches
 __pycache__/
