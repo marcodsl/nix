@@ -1,7 +1,10 @@
 {...}: {
   imports = [
     ./caddy.nix
+    ./cloudflared.nix
     ./deskflow.nix
+    ./falcon-sensor.nix
+    ./litellm.nix
     ./loaders.nix
     ./mullvad.nix
     ./ntpd.nix

@@ -56,10 +56,8 @@
       ];
 
       imports = [
-        ./modules/flake/activate-home.nix
-        ./modules/flake/devshell.nix
-        ./modules/flake/neovim.nix
-        ./modules/flake/toplevel.nix
+        ./lib
+        ./modules/flake
       ];
     };
 }

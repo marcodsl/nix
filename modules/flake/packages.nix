@@ -14,11 +14,16 @@
     formatter = pkgs.alejandra;
 
     packages = let
-      burpSuiteProPath = ../../packages/burp-suite-pro;
       burpSuiteProAvailable =
         pkgs.stdenv.isLinux
-        && builtins.pathExists (burpSuiteProPath + /default.nix)
-        && builtins.pathExists (burpSuiteProPath + /loader.jar);
+        && builtins.pathExists (self + /packages/burp-suite-pro/default.nix)
+        && builtins.pathExists (self + /packages/burp-suite-pro/loader.jar);
+
+      falconSensorAvailable =
+        pkgs.stdenv.isLinux
+        && builtins.pathExists (self + /packages/falcon-sensor/default.nix)
+        && builtins.pathExists (self + /packages/falcon-sensor/falcon-sensor.deb);
+
       nhExe = lib.getExe pkgs.nh;
       activate = pkgs.writeShellApplication {
         name = "activate";
@@ -154,7 +159,10 @@
         skills-ref = pkgs.callPackage "${self}/packages/skills-ref" {};
       }
       // lib.optionalAttrs burpSuiteProAvailable {
-        burp-suite-pro = pkgs.callPackage burpSuiteProPath {};
+        burp-suite-pro = pkgs.callPackage (self + /packages/burp-suite-pro) {};
+      }
+      // lib.optionalAttrs falconSensorAvailable {
+        falcon-sensor = pkgs.callPackage (self + /packages/falcon-sensor) {};
       };
 
     _module.args.pkgs = import inputs.nixpkgs {

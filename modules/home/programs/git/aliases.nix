@@ -20,6 +20,31 @@
 
     save = "stash push -u";
     pop = "stash pop";
+    sl = "stash list";
+    ss = "stash show -p";
+    sa = "stash apply";
+    sd = "stash drop";
+
+    db = "!sh -c 'git symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null | sed s@^origin/@@ || gh repo view --json defaultBranchRef --jq .defaultBranchRef.name'";
+    sync = "!git fetch origin --prune && git rebase origin/$(git db)";
+    swd = "!git switch $(git db)";
+    pm = "!gh poi";
+
+    fixup = "commit --fixup";
+    squash = "commit --squash";
+    amend = "commit --amend --no-edit";
+    ri = "rebase --interactive";
+    ras = "!git rebase --interactive --autosquash origin/$(git db)";
+    rc = "rebase --continue";
+    ra = "rebase --abort";
+
+    mt = "mergetool";
+    conflicted = "diff --name-only --diff-filter=U";
+    ours = "checkout --ours --";
+    theirs = "checkout --theirs --";
+    mb = "!git merge-base HEAD $(git db)";
+    rrs = "rerere status";
+    rrd = "rerere diff";
 
     hist = ''
       log --pretty=format:"%Cgreen%h %Creset%cd %Cblue[%cn] %Creset%s%C(yellow)%d%C(reset)" --graph --date=relative --decorate --all

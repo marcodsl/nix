@@ -1,13 +1,42 @@
 {
   config,
+  flake,
   lib,
+  osConfig,
   pkgs,
   ...
 }: let
   stopHook = pkgs.writeShellApplication {
     name = "claude-stop-hook";
-    runtimeInputs = with pkgs; [jq nix gnugrep coreutils];
+    runtimeInputs = [
+      pkgs.jq
+      pkgs.nix
+      pkgs.gnugrep
+      pkgs.coreutils
+      flake.self.packages.${pkgs.stdenv.hostPlatform.system}.skills-ref
+    ];
     text = builtins.readFile ./hooks/stop.sh;
+  };
+
+  otelHeadersHelper = pkgs.writeShellApplication {
+    name = "claude-otel-headers";
+    runtimeInputs = [pkgs.coreutils];
+    text = ''
+      token="$(cat ${config.sops.secrets."betterstack/claude_source_token".path})"
+      printf '{"Authorization":"Bearer %s"}\n' "$token"
+    '';
+  };
+
+  # Claude reads the OTEL exporter endpoint from its own process env; the URL
+  # is tenant-identifying so it's kept in sops and sourced at launch time.
+  claudeWrapped = pkgs.symlinkJoin {
+    name = "claude-code-otel-wrapped";
+    paths = [pkgs.claude-code];
+    nativeBuildInputs = [pkgs.makeWrapper];
+    postBuild = ''
+      wrapProgram $out/bin/claude \
+        --run 'set -a; . ${config.sops.templates."claude-otel.env".path}; set +a'
+    '';
   };
 
   mkClaudeAgent = {
@@ -27,40 +56,113 @@
     ---
     ${prompt}
   '';
+
+  telemetryHostName =
+    if osConfig != null
+    then osConfig.networking.hostName
+    else config.home.username;
+
+  nixManagedSettings = {
+    # Mirrors the $schema key the upstream module would have injected,
+    # so editors keep validating after we suppress its symlink.
+    "$schema" = "https://json.schemastore.org/claude-code-settings.json";
+
+    theme = "dark";
+
+    attribution = {
+      commit = "";
+      pr = "";
+    };
+
+    showThinkingSummaries = true;
+    skillListingBudgetFraction = 0.03;
+
+    spinnerTipsEnabled = false;
+    includeGitInstructions = false;
+    cleanupPeriodDays = 20;
+
+    forceLoginMethod = "claudeai";
+    language = "english";
+    useAutoModeDuringPlan = true;
+
+    permissions.disableBypassPermissionsMode = "disable";
+
+    teammateMode = "auto";
+
+    worktree.symlinkDirectories = [
+      "node_modules"
+      ".envrc"
+      ".direnv"
+      ".env"
+      ".env.local"
+      ".CLAUDE.md"
+      ".claude"
+      ".vscode"
+    ];
+
+    otelHeadersHelper = lib.getExe otelHeadersHelper;
+
+    # OTEL_EXPORTER_OTLP_*_ENDPOINT come from the sops-rendered
+    # claude-otel.env, sourced by the wrapper above.
+    env = {
+      CLAUDE_CODE_ENABLE_TELEMETRY = "1";
+      CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS = "1";
+      CLAUDE_CODE_ENHANCED_TELEMETRY_BETA = "1";
+
+      OTEL_METRICS_EXPORTER = "otlp";
+      OTEL_LOGS_EXPORTER = "otlp";
+      OTEL_TRACES_EXPORTER = "otlp";
+
+      OTEL_EXPORTER_OTLP_PROTOCOL = "http/protobuf";
+      OTEL_EXPORTER_OTLP_COMPRESSION = "gzip";
+
+      OTEL_METRIC_EXPORT_INTERVAL = "30000";
+      OTEL_METRICS_INCLUDE_VERSION = "true";
+      OTEL_LOG_TOOL_DETAILS = "1";
+      OTEL_RESOURCE_ATTRIBUTES = "host.name=${telemetryHostName}";
+    };
+
+    enabledMcpjsonServers = lib.attrNames config.programs.mcp.servers;
+    hooks.Stop = [
+      {
+        hooks = [
+          {
+            type = "command";
+            command = lib.getExe stopHook;
+          }
+        ];
+      }
+    ];
+  };
+
+  jsonFormat = pkgs.formats.json {};
+  nixStateFile = jsonFormat.generate "claude-nix-state.json" nixManagedSettings;
+
+  # Upstream `programs.claude-code` hard-codes `.claude/`, so no XDG branch.
+  claudeHomeRel = ".claude";
+  claudeHomeAbs = "${config.home.homeDirectory}/${claudeHomeRel}";
+  userSettingsPath = "${claudeHomeAbs}/settings.json";
+  prevStatePath = "${claudeHomeAbs}/.nix-managed.json";
+
+  # Deep recursive merge: nix-declared keys overwrite user values at every
+  # depth; keys nix no longer declares are removed; sibling keys claude
+  # writes at runtime (or the user adds by hand) survive untouched.
+  # Lists are overwritten wholesale; deep list merge is intentionally out
+  # of scope.
+  mergeScript = flake.self.lib.mkSettingsMerge pkgs {
+    name = "claude-settings-merge";
+    format = "json";
+    deep = true;
+  };
 in {
   programs.claude-code = {
     enable = true;
     enableMcpIntegration = true;
+    package = claudeWrapped;
 
     context = ./CLAUDE.md;
 
-    settings = {
-      theme = "dark";
-
-      attribution = {
-        commit = "";
-        pr = "";
-      };
-
-      showThinkingSummaries = true;
-      skillListingBudgetFraction = 0.03;
-
-      spinnerTipsEnabled = false;
-      includeGitInstructions = false;
-      cleanupPeriodDays = 90;
-
-      enabledMcpjsonServers = lib.attrNames config.programs.mcp.servers;
-      hooks.Stop = [
-        {
-          hooks = [
-            {
-              type = "command";
-              command = lib.getExe stopHook;
-            }
-          ];
-        }
-      ];
-    };
+    settings = nixManagedSettings;
 
     skills = let
       mkSkillDir = path:
@@ -71,10 +173,7 @@ in {
     in
       (mkSkillDir config.me.ai.skills) // (mkSkillDir ./skills);
 
-    commands = lib.pipe (builtins.readDir ./commands) [
-      (lib.filterAttrs (name: type: type == "regular" && lib.hasSuffix ".md" name))
-      (lib.mapAttrs' (name: _: lib.nameValuePair (lib.removeSuffix ".md" name) (./commands + "/${name}")))
-    ];
+    commandsDir = ./commands;
 
     agents = {
       researcher = mkClaudeAgent {
@@ -127,4 +226,16 @@ in {
       };
     };
   };
+
+  # Upstream symlinks settings.json to a read-only /nix/store path; claude
+  # needs to write runtime preferences into it, so suppress the symlink and
+  # let the activation script below materialise a regular file instead.
+  home.file."${claudeHomeRel}/settings.json".enable = lib.mkForce false;
+
+  home.activation.mergeClaudeSettings = lib.hm.dag.entryAfter ["writeBoundary"] ''
+    $DRY_RUN_CMD ${lib.getExe mergeScript} \
+      --state ${nixStateFile} \
+      --prev-state ${lib.escapeShellArg prevStatePath} \
+      --user ${lib.escapeShellArg userSettingsPath}
+  '';
 }

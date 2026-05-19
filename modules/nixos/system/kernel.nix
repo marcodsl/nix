@@ -24,7 +24,6 @@ in {
       };
 
       kernelParams = [
-        "splash"
         "transparent_hugepage=madvise"
       ];
 

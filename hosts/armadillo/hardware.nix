@@ -24,7 +24,14 @@
     options = ["fmask=0077" "dmask=0077"];
   };
 
-  swapDevices = [];
+  # Lower-priority overflow tier below zramSwap (priority 100).
+  swapDevices = [
+    {
+      device = "/swapfile";
+      size = 8192;
+      priority = 10;
+    }
+  ];
 
   services = {
     fstrim.enable = true;

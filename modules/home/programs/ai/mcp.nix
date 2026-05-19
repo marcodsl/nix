@@ -8,66 +8,71 @@
 
   gatewayPort = 8123;
 
-  # Each secret-bearing backend reads only its own token from sops at exec
-  # time, so the gateway's env and argv (visible via /proc/<pid>/cmdline)
-  # stay free of credentials.
+  # Each secret-bearing backend reads only its own token at exec time, so
+  # the gateway's env and argv (visible via /proc/<pid>/cmdline) stay
+  # credential-free.
   mkBackend = {
     name,
     runtimeInputs,
-    secretEnv,
-    secretPath,
     exec,
-    extraExports ? "",
+    secretEnv,
+    secretKey,
+    env ? {},
   }:
     lib.getExe (pkgs.writeShellApplication {
-      inherit name runtimeInputs;
+      name = "${name}-mcp-backend";
+      inherit runtimeInputs;
       text = ''
-        ${extraExports}${secretEnv}="$(cat ${secretPath})"
+        ${lib.concatMapAttrsStringSep "\n" (k: v: "export ${k}=${lib.escapeShellArg v}") env}
+        ${secretEnv}="$(cat ${secrets."mcp/${secretKey}".path})"
         export ${secretEnv}
         exec ${exec}
       '';
     });
 
-  githubBackend = mkBackend {
-    name = "github-mcp-backend";
-    runtimeInputs = [pkgs.github-mcp-server];
-    secretEnv = "GITHUB_PERSONAL_ACCESS_TOKEN";
-    secretPath = secrets."mcp/github-token".path;
-    exec = "github-mcp-server stdio";
-    extraExports = ''
-      export GITHUB_TOOLSETS="default,actions,code_security,copilot"
-    '';
-  };
-  todoistBackend = mkBackend {
-    name = "todoist-mcp-backend";
-    runtimeInputs = [pkgs.nodejs];
-    secretEnv = "TODOIST_API_KEY";
-    secretPath = secrets."mcp/todoist-token".path;
-    exec = "npx @doist/todoist-ai";
-  };
   # mcp-proxy in client mode auto-converts $API_ACCESS_TOKEN into an
-  # `Authorization: Bearer <token>` header, so we pass the bearer via env
-  # instead of `-H` argv.
-  linearBackend = mkBackend {
-    name = "linear-mcp-backend";
-    runtimeInputs = [pkgs.mcp-proxy];
-    secretEnv = "API_ACCESS_TOKEN";
-    secretPath = secrets."mcp/linear-token".path;
-    exec = "mcp-proxy --transport streamablehttp https://mcp.linear.app/mcp";
+  # `Authorization: Bearer <token>` header.
+  mkProxyBackend = name: url: secretKey:
+    mkBackend {
+      inherit name secretKey;
+      runtimeInputs = [pkgs.mcp-proxy];
+      secretEnv = "API_ACCESS_TOKEN";
+      exec = "mcp-proxy --transport streamablehttp ${url}";
+    };
+
+  backends = {
+    github = mkBackend {
+      name = "github";
+      runtimeInputs = [pkgs.github-mcp-server];
+      secretEnv = "GITHUB_PERSONAL_ACCESS_TOKEN";
+      secretKey = "github-token";
+      exec = "github-mcp-server stdio";
+      env.GITHUB_TOOLSETS = "default,actions,code_security,copilot";
+    };
+    todoist = mkBackend {
+      name = "todoist";
+      runtimeInputs = [pkgs.nodejs];
+      secretEnv = "TODOIST_API_KEY";
+      secretKey = "todoist-token";
+      exec = "npx @doist/todoist-ai";
+    };
+    context7 = lib.getExe' pkgs.context7-mcp "context7-mcp";
+    linear = mkProxyBackend "linear" "https://mcp.linear.app/mcp" "linear-token";
+    betterstack = mkProxyBackend "betterstack" "https://mcp.betterstack.com" "betterstack-token";
   };
-  context7Backend = lib.getExe' pkgs.context7-mcp "context7-mcp";
 
   gateway = pkgs.writeShellApplication {
     name = "mcp-gateway";
     runtimeInputs = [pkgs.mcp-proxy];
+    # --pass-environment forwards the gateway's env to every backend; never
+    # add Environment= to the unit below — anything there leaks to all five.
     text = ''
       exec mcp-proxy \
         --host 127.0.0.1 --port ${toString gatewayPort} \
         --pass-environment \
-        --named-server github   ${lib.escapeShellArg githubBackend} \
-        --named-server todoist  ${lib.escapeShellArg todoistBackend} \
-        --named-server context7 ${lib.escapeShellArg context7Backend} \
-        --named-server linear   ${lib.escapeShellArg linearBackend}
+        ${lib.concatMapStringsSep " \\\n  "
+        (n: "--named-server ${n} ${lib.escapeShellArg backends.${n}}")
+        (lib.attrNames backends)}
     '';
   };
 in {
@@ -82,19 +87,18 @@ in {
       Restart = "on-failure";
       RestartSec = "2s";
       ExecStart = lib.getExe gateway;
+      MemoryHigh = "2G";
+      MemoryMax = "3G";
+      TasksMax = 512;
     };
     Install.WantedBy = ["default.target"];
   };
 
   programs.mcp = {
     enable = true;
-    servers = let
-      url = name: {url = "http://127.0.0.1:${toString gatewayPort}/servers/${name}/mcp";};
-    in {
-      context7 = url "context7";
-      github = url "github";
-      linear = url "linear";
-      todoist = url "todoist";
-    };
+    servers =
+      lib.mapAttrs
+      (name: _: {url = "http://127.0.0.1:${toString gatewayPort}/servers/${name}/mcp";})
+      backends;
   };
 }

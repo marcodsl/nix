@@ -16,6 +16,26 @@
       sysprof
     ])
     ++ gnomeExtensions;
+
+  lockedDconfSettings = {
+    "org/gnome/desktop/session" = {
+      idle-delay = lib.gvariant.mkUint32 0;
+    };
+
+    "org/gnome/desktop/screensaver" = {
+      lock-enabled = false;
+      idle-activation-enabled = false;
+    };
+
+    "org/gnome/settings-daemon/plugins/power" = {
+      sleep-inactive-ac-type = "nothing";
+      sleep-inactive-battery-type = "nothing";
+    };
+  };
+
+  lockedDconfPaths = lib.flatten (lib.mapAttrsToList
+    (path: settings: map (key: "/${path}/${key}") (lib.attrNames settings))
+    lockedDconfSettings);
 in {
   config = lib.mkIf config.services.desktopManager.gnome.enable {
     services.dbus.packages = with pkgs; [gnome2.GConf];
@@ -51,16 +71,20 @@ in {
       profiles.user.databases =
         lib.singleton
         {
-          settings = {
-            "org/gnome/shell" = {
-              enabled-extensions =
-                lib.map (ext: ext.extensionUuid) gnomeExtensions;
-            };
+          settings =
+            {
+              "org/gnome/shell" = {
+                enabled-extensions =
+                  lib.map (ext: ext.extensionUuid) gnomeExtensions;
+              };
 
-            "org/gnome/desktop/interface" = {
-              color-scheme = "prefer-dark";
-            };
-          };
+              "org/gnome/desktop/interface" = {
+                color-scheme = "prefer-dark";
+              };
+            }
+            // lockedDconfSettings;
+
+          locks = lockedDconfPaths;
         };
     };
 

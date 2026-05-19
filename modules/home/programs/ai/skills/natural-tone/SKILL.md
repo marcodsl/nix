@@ -1,6 +1,6 @@
 ---
 name: natural-tone
-description: "Write direct, human prose that replaces filler with concrete facts. Use when: editing docs, READMEs, technical notes, commit messages, PR descriptions, or tightening vague, hedged, promotional, or formulaic text."
+description: "Edit prose to read as human, not AI-generated. Replace filler, hedging, marketing voice, and AI tells (em dashes, monotonous openers, padded three-item lists, restated claims, stacked adjectives) with concrete actions, named actors, scoped claims, and evidence. Use when: tightening docs, READMEs, PR descriptions, commit messages, release notes, technical notes, code comments, Slack or email drafts, or AI-generated text that sounds robotic, formulaic, hedged, promotional, or vague."
 license: AGPL-3.0-only
 metadata:
   author: marcodsl
@@ -9,286 +9,87 @@ metadata:
 
 # Natural Tone
 
-## Purpose
+<purpose>
+Rewrite prose so readers can see who does what, what changes, and why it matters. Replace filler, hedging, and generic claims with concrete actions, scope, and evidence.
+</purpose>
 
-Use this skill to rewrite prose so readers can see who does what, what changes, and why it matters. Replace filler, hedging, and generic claims with concrete actions, scope, and evidence.
+<scope>
+  <use_when>
+  - Editing docs, READMEs, PR descriptions, commit messages, release notes, issue summaries, and other narrative text.
+  - Rewriting text that sounds vague, hedged, promotional, or formulaic.
+  - Tightening technical notes, API docs, and user-facing explanations so claims are easier to verify.
+  - Editing code comments or inline documentation where the comment explains intent, behavior, or rationale in prose.
+  - Editing AI-generated drafts, model responses, or chatbot output that sounds robotic, formulaic, or vague.
+  - Tightening short-form copy: Slack messages, emails, release notes, or social posts.
+  </use_when>
 
-## Scope
+  <do_not_use_when>
+  - Designing prompts, agent instructions, or system-instruction architecture. Use `prompt-engineering` for prompt structure and agent behavior; use this skill to tighten the prose inside those artifacts.
+  - Defining API contracts, schema semantics, or implementation behavior where the main task is design accuracy rather than prose quality.
+  - Writing terse labels, identifiers, table cells, diagram labels, or machine-oriented fields where exact syntax matters more than tone or flow.
+  </do_not_use_when>
+</scope>
 
-### Use this skill when
+<governing_rule>
+Name the actor, the action, and the result. If a word does not change the meaning, delete it or replace it with a concrete fact. If the sentence already names actor, action, and result without filler, leave it unchanged. If no edits are needed across the entire input, confirm the text is already optimized and return it as is.
 
-- Editing docs, READMEs, PR descriptions, commit messages, release notes, issue summaries, and other narrative text.
-- Rewriting text that sounds vague, hedged, promotional, or formulaic.
-- Tightening technical notes, API docs, and user-facing explanations so claims are easier to verify.
+**Why:** filler is not just decorative. It forces the reader to guess what the writer means, and it is the single biggest reason prose reads as machine-generated.
+</governing_rule>
 
-### Do not use this skill when
+<working_method>
+1. Read each sentence and check that actor, action, and result are present.
+2. Apply the four rule sections below as patterns to spot. Use whichever matches; the rules do not override one another.
+3. Before shipping, scan for AI structural tells (see `references/ai-structural-tells.md`).
+4. Run the review checklist.
+</working_method>
 
-- Designing prompts, agent instructions, or system-instruction architecture. Use `prompt-engineering` for prompt structure and agent behavior. Use this skill to tighten the prose inside those artifacts.
-- Defining API contracts, schema semantics, or implementation behavior where the main task is design accuracy rather than prose quality.
-- Writing terse labels, identifiers, or machine-oriented fields where exact syntax matters more than tone or flow.
+<section name="concrete-over-abstract">
+- Replace filler adjectives with explicit scope. "Comprehensive" becomes the list of covered topics; "robust" becomes the concrete guarantee; "seamless" becomes the specific user outcome. **Why:** filler adjectives are labels, not claims. They tell the reader the writer believes the thing is good without naming what makes it good.
+- Replace vague verbs with direct actions and name the actor. Prefer "use", "send", "store", "validate", "reject", "render", "return". Avoid verbs that hide the actor, such as "facilitate" or "enable". **Why:** agentless or abstract verbs leave the reader to guess who does what. Naming the actor and a concrete verb removes one guess per sentence.
+- Cut hedging and hype; replace generic claims with bounded ones. Delete openers like "It should be noted that" or "This aims to". Replace "dramatically improves" with a measured outcome. Replace "can be beneficial in many scenarios" with the actual constraint or fit. **Why:** unbounded claims cannot be verified or falsified. Bounded claims invite scrutiny, which is what readers trust.
 
-## Governing rule
+See `references/filler-replacements.md` for the full pattern → replacement list.
+</section>
 
-Name the actor, the action, and the result. If a word does not change the meaning, delete it or replace it with a concrete fact.
+<section name="sentence-mechanics">
+- Keep one core claim per sentence. Split chained claims into shorter sentences. Put the important fact first; move caveats later if the sentence still reads cleanly. **Why:** chained claims hide the structure of the argument. One claim per sentence lets the reader follow and challenge each link.
+- Use ASCII punctuation. Never use em dashes (—); replace with a period, a comma, or a restructured sentence. Em dashes are a strong signal of machine-generated text.
+- Pick the one adjective that earns its keep; replace the others with the concrete attribute they were gesturing at. Prefer plain transitions over filler bridges like "Additionally" when a simpler sentence works. **Why:** stacked adjectives stack vague claims. Picking one forces the writer to decide which property actually matters.
+</section>
 
-## Core policy rules
+<section name="rhythm-and-repetition">
+- State each claim once. If the reader needs more context, add a new fact, not a paraphrase. Delete restatement openers like "In other words", "To put it simply", or "Essentially". **Why:** paraphrase reads as padding because it adds words without adding information. The reader notices and starts skimming.
+- Vary sentence length and structure across consecutive sentences. Follow a long sentence with a short one. Break a list with a direct statement when it sharpens the point. **Why:** uniform sentence length flattens emphasis. Varying length tells the reader which sentences carry the load.
+- Limit consecutive same-opener sentences to two. Watch for runs of "This [noun] [verb]s", "The [noun] [verb]s", or "By [verb]-ing"; rewrite at least one using a verb, object, condition, or dependent clause. **Why:** uniform openers are one of the strongest signals of machine-generated text. They appear because the model defaults to the same grammatical pivot when it has nothing structural to vary.
+</section>
 
-1. Replace filler adjectives with explicit scope.
+<section name="audience-and-structure">
+- Match context length to what the reader does not already know. Skip the project summary in a PR; skip the HTTP primer in an API doc. Over-explaining shared context signals that the writer does not know the audience.
+- State tradeoffs directly. Name the cost and the benefit as separate claims. Either order works; merging them into a single consolation clause does not. **Why:** consolation clauses ("while X, it Y") compress a real tradeoff into a rhetorical move. The reader needs both numbers to make the decision, not a feel-good resolution.
+- Use the natural count in lists. List two when the real count is two, five when it is five. Readers notice when an item is filler or when meaningful items are missing.
+- Vary paragraph structure across the document. Not every paragraph needs topic sentence, support, summary. Some paragraphs work better starting with evidence, a constraint, or a question. **Why:** uniform paragraph shape is itself a tell. It signals the writer applied a template instead of asking what each paragraph needs.
+- Keep register consistent within a section. "Utilize" next to "cool" breaks trust. Shift register between sections if the audience context changes, not mid-thought.
+</section>
 
-- Replace "comprehensive" with what is covered.
-- Replace "robust" with the concrete guarantee or behavior.
-- Replace "seamless" with the actual user impact.
-
-2. Replace vague verbs with direct actions.
-
-- Prefer "use", "send", "store", "validate", "reject", "render", or "return".
-- Avoid verbs that hide the actor, such as "facilitate" or "enable", unless you also name who does what.
-
-3. Remove hedging and hype.
-
-- Delete openers like "It should be noted that" or "This aims to".
-- Replace claims like "dramatically improves" with measured outcomes or bounded statements.
-
-4. Keep one core claim per sentence.
-
-- Split chained claims into shorter sentences.
-- Put important facts first.
-- Move caveats later if the sentence still reads cleanly.
-
-5. Keep prose mechanically clean.
-
-- Use ASCII punctuation.
-- Avoid em dashes and trailing semicolons in prose.
-- Avoid stacked adjectives before a noun.
-- Prefer plain transitions over filler bridges like "Additionally" when a simpler sentence works.
-
-6. State each claim once.
-
-- Say it once. If the reader needs more context, add a new fact, not a paraphrase.
-- Delete "In other words", "To put it simply", and "Essentially" when they introduce a restatement.
-
-7. Replace generic hedging with a bounded claim or an explicit stance.
-
-- "This can be beneficial in many scenarios" hides the scope. Write "This is a reasonable default for teams under 10 engineers" or name the actual constraint.
-- Trust the reader to ask. Address objections when the reader raises them, not preemptively.
-
-8. Vary sentence rhythm and structure.
-
-- Follow a long sentence with a short one.
-- Break a list with a direct statement when it sharpens the point.
-- Drop into a question when it focuses the reader better than a declaration.
-- Avoid repeating the same clause pattern across consecutive sentences.
-
-9. Diversify sentence openers.
-
-- Limit consecutive same-opener sentences to two. Rewrite at least one using a verb, object, condition, or dependent clause.
-- Watch for runs of "This [noun] [verb]s", "The [noun] [verb]s", or "By [verb]-ing". Rewrite at least one.
-- Start with the verb, the object, a condition, or a dependent clause when it reads more naturally.
-
-10. Match context length to what the reader does not already know.
-
-- If the reader is reviewing a PR, they know the repo. Skip the project summary.
-- If the reader is in an API doc, they know HTTP. Don't explain what a status code is.
-- Over-explaining shared context signals that the writer doesn't know the audience.
-
-11. State tradeoffs directly.
-
-- State the cost and the benefit as separate claims. Either order works. Merging them into one hedged sentence does not.
-
-12. Use the natural count in lists.
-
-- If the real count is two, list two. If it is five, list five.
-- Use the natural count. Readers notice when the third item is filler or when meaningful items are missing.
-
-13. Vary paragraph structure.
-
-- Not every paragraph needs a topic sentence followed by support followed by a summary.
-- Some paragraphs work better starting with evidence, a constraint, or a question.
-- Uniform paragraph shape across a document is a readability problem even when individual sentences are good.
-
-14. Keep register consistent within a section.
-
-- Keep formal and informal tone separate. "Utilize" next to "cool" breaks trust.
-- Pick a register that fits the audience and hold it. Shift between sections if the audience context changes, not mid-thought.
-
-## Technical terms and exceptions
-
-Use technical terms when they improve precision for the intended audience.
+<section name="technical-terms">
+Use technical terms when they reduce ambiguity or align with domain-specific terminology for the intended audience. For mixed audiences, keep the technical term and add a short plain-language gloss in parentheses on first use.
 
 - Keep domain terms such as "idempotent", "eventual consistency", or "domain-specific" when replacing them would make the text less exact.
 - Keep protocol names, error classes, measured values, and implementation constraints when they carry real meaning.
 - Preserve details that change the behavior, limits, or risks being described.
+</section>
 
-## Common filler and replacements
-
-| Filler pattern                                   | Replace with                                                  |
-| ------------------------------------------------ | ------------------------------------------------------------- |
-| "leverage" or "utilize"                          | "use"                                                         |
-| "facilitate communication"                       | the concrete action, such as "send messages between services" |
-| "seamless"                                       | the actual user impact                                        |
-| "high-quality"                                   | the quality signal, metric, or guarantee                      |
-| "comprehensive"                                  | the exact scope or covered components                         |
-| "scalable"                                       | the workload, limit, or growth behavior                       |
-| "Furthermore" / "Moreover" / "It's worth noting" | delete, or start the next sentence directly                   |
-| "This ensures that" / "This allows for"          | name what actually happens                                    |
-| "In other words" / "To put it simply"            | delete the restatement                                        |
-| "In terms of"                                    | name the dimension directly, such as "latency" or "cost"      |
-| "While X has limitations, it provides..."        | state the cost and the benefit as separate claims             |
-| "By [verb]-ing..., we can..." (repeated)         | vary the opener; start with the result or a condition         |
-
-## Examples
-
-### Example 1: Filler adjectives
-
-Bad: "This README provides a comprehensive overview of the setup process."
-
-Good: "This README covers installation, configuration, and the first run command."
-
-Why it fails: "comprehensive" hides the scope instead of naming it.
-
-Why it works: it tells the reader exactly what the document covers.
-
-### Example 2: Vague verbs
-
-Bad: "The service enables reliable communication between components."
-
-Good: "The service queues events, retries failed deliveries, and stores a dead-letter record after the final retry."
-
-Why it fails: "enables" and "reliable" describe the result without showing how the system behaves.
-
-Why it works: it names the concrete actions that make the behavior reliable.
-
-### Example 3: Empty capability labels
-
-Bad: "Capabilities: Provides robust validation and high-quality reporting."
-
-Good: "Validates required fields before saving and writes one error summary per failed import."
-
-Why it fails: "robust" and "high-quality" are labels, not behaviors.
-
-Why it works: it tells the reader what the feature does and when it does it.
-
-### Example 4: Hype without evidence
-
-Bad: "It should be noted that this dramatically improves performance across all scenarios."
-
-Good: "This change removes one repeated database query from the request path. In local profiling, median response time dropped from 140 ms to 95 ms."
-
-Why it fails: hedging and hype replace evidence.
-
-Why it works: it gives a measured result and context.
-
-### Example 5: Technical precision
-
-Bad: "The API returns a user-friendly error when validation fails."
-
-Good: "The API returns HTTP 400 with a field-level error list when validation fails."
-
-Why it fails: "user-friendly" says almost nothing about the actual response.
-
-Why it works: it names the status code and the structure the caller can expect.
-
-### Example 6: Redundant restatement (technical)
-
-Bad: "The cache reduces latency by storing responses locally. In other words, it keeps a copy of the data close to the caller so requests don't have to travel to the origin server."
-
-Good: "The cache stores responses locally. Reads hit the cache first and fall back to the origin server on a miss."
-
-Why it fails: the second sentence restates the first in different words instead of adding information.
-
-Why it works: each sentence carries a distinct fact. The reader learns the lookup order, not just a paraphrase.
-
-### Example 7: Redundant restatement (non-technical)
-
-Bad: "The new policy reduces turnaround time. Essentially, requests are processed faster because fewer approvals are needed."
-
-Good: "The new policy removes one approval step. Average turnaround dropped from five days to three."
-
-Why it fails: "Essentially" introduces a restatement that adds no new information.
-
-Why it works: the second sentence adds a measured result instead of rephrasing the first.
-
-### Example 8: Generic hedging vs. bounded claim (technical)
-
-Bad: "This approach can be beneficial in many scenarios and may help improve overall efficiency."
-
-Good: "This approach cuts one network round-trip per request. It works well for read-heavy endpoints but adds staleness risk on writes."
-
-Why it fails: "many scenarios" and "may help" avoid naming where it works and where it breaks.
-
-Why it works: it states the gain, the fit, and the tradeoff.
-
-### Example 9: Generic hedging vs. bounded claim (non-technical)
-
-Bad: "Switching vendors could potentially lead to cost savings in certain situations."
-
-Good: "Switching to Vendor B saves $1,200/month on the current plan. The savings disappear above 50 seats because Vendor B charges per user."
-
-Why it fails: "potentially" and "certain situations" avoid naming the condition.
-
-Why it works: it gives the saving, the threshold, and the reason the saving stops.
-
-### Example 10: Monotonous sentence openers
-
-Bad: "The system validates input. The system rejects malformed requests. The system logs each rejection. The system returns a 400 status code."
-
-Good: "Input is validated on arrival. Malformed requests are rejected and logged. The caller gets a 400 with a field-level error list."
-
-Why it fails: four consecutive sentences start with "The system". The structure is robotic.
-
-Why it works: it varies the subject and merges related actions, which reads like a person wrote it.
-
-### Example 11: Padded list
-
-Bad: "Benefits include: faster builds, lower memory usage, and improved developer experience."
-
-Good: "Builds finish in half the time. Peak memory dropped from 4 GB to 2.1 GB."
-
-Why it fails: "improved developer experience" is padding to reach three items. It adds no testable claim.
-
-Why it works: it lists the two real benefits with evidence and drops the filler third item.
-
-### Example 12: Consolation-clause concession
-
-Bad: "While this migration has some inherent complexity, it ultimately provides a more maintainable architecture."
-
-Good: "The migration touches 14 files and takes roughly two days. After it lands, adding a new provider is a single-file change."
-
-Why it fails: "some inherent complexity" hides the actual cost, and "ultimately provides" hides the actual gain.
-
-Why it works: it names the cost (14 files, two days) and the payoff (single-file change) as separate, verifiable facts.
-
-## AI structural tells
-
-Scan for these patterns before shipping. Each one signals machine-generated text.
-
-1. Three or more consecutive sentences starting with "The" or "This".
-2. Every paragraph follows topic-sentence / support / summary.
-3. Lists always have exactly three items.
-4. Concessions use "While X, it Y" structure.
-5. Transitions are always "Additionally", "Furthermore", or "Moreover".
-6. Every claim is hedged with "can", "may", or "potentially".
-7. Register shifts mid-paragraph (formal next to colloquial).
-8. Sentences are roughly the same length throughout.
-9. The text restates a point in different words right after making it.
-10. Context is explained that the target reader already knows.
-11. Adjectives stack before nouns: "a robust, scalable, enterprise-grade solution".
-12. The conclusion mirrors the introduction almost word for word.
-
-## Verification checklist
-
+<review_checklist>
 - [ ] Each claim names an actor and an action.
-- [ ] Filler terms are removed or replaced with specific facts.
-- [ ] Performance claims include evidence, a metric, or a bounded qualifier.
-- [ ] Technical jargon is kept only when it improves precision for the target audience.
-- [ ] Sentences are short, direct, and focused on one main claim.
-- [ ] Prose uses ASCII punctuation and avoids em dashes and trailing semicolons.
-- [ ] No sentence restates a previous claim in different words.
-- [ ] Hedged claims are replaced with bounded qualifiers or explicit stances.
-- [ ] Sentence length and structure vary across consecutive sentences.
-- [ ] No more than two consecutive sentences share the same opener word or structure.
-- [ ] Context explanations are proportional to what the reader does not already know.
-- [ ] Tradeoffs are stated as separate cost and benefit claims, not merged into consolation clauses.
-- [ ] Lists use the natural item count, not padded or trimmed to three.
-- [ ] Paragraph structure varies across the document.
+- [ ] Performance and behavior claims carry evidence, a metric, or a bounded qualifier.
+- [ ] Tradeoffs read as separate cost and benefit claims, not consolation clauses.
+- [ ] Lists use the natural item count.
 - [ ] Register stays consistent within each section.
+- [ ] `references/ai-structural-tells.md` scanned; no two or more patterns trip in the same passage. The scan covers em dashes, restatement, uniform sentence length and openers, over-explained shared context, and other pattern-level tells; the items above stay because they require reading for meaning rather than matching a pattern.
+</review_checklist>
+
+<bundled_resources>
+- `references/examples.md`: twelve before/after worked examples grouped by rule section, with "why it fails" and "why it works" commentary.
+- `references/filler-replacements.md`: pattern → replacement bullet list plus edge-case notes.
+- `references/ai-structural-tells.md`: thirteen patterns to scan before shipping.
+</bundled_resources>
