@@ -249,6 +249,13 @@ in {
         disallowedTools = ["Bash" "Edit" "Write"];
         prompt = builtins.readFile ./agents/review-synthesizer.md;
       };
+
+      fight-validator = mkClaudeAgent {
+        name = "fight-validator";
+        description = "Validator subagent for the /fight-implement autonomous loop. Re-runs every command the implementer reported, adversarially evaluates the captured diff against the plan, and emits a JSON verdict with file:line citations. Read-only on source. Not for direct invocation.";
+        disallowedTools = ["Edit" "Write"];
+        prompt = builtins.readFile ./agents/fight-validator.md;
+      };
     };
   };
 

@@ -50,6 +50,7 @@
     ".claude/settings.local.json"
     "CONVENTIONS.local.md"
     "GEMINI.local.md"
+    ".fight/"
 
     # macOS
     "._*"
