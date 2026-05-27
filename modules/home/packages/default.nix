@@ -23,6 +23,8 @@
       jython
       nil
       nodejs
+      oxfmt
+      oxlint
       zx
 
       # Communication
