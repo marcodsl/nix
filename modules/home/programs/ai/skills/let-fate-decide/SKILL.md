@@ -1,130 +1,117 @@
 ---
 name: let-fate-decide
-description: "Draws 4 Tarot cards to inject entropy into planning when prompts are vague, ambiguous, or casually delegated. Interprets the spread to guide next steps. Use when the user says 'let fate decide', 'YOLO', 'whatever', 'idk', or other nonchalant phrases, makes Yu-Gi-Oh references, or when you are about to arbitrarily pick between multiple reasonable approaches. Prefer over ask-questions-if-underspecified when the user's tone is casual or playful rather than precision-seeking."
+description: "Draw 4 Tarot cards with real crypto-random entropy to break a tie when prompts are vague or casually delegated, then map the spread to a concrete next step. Triggers: 'let fate decide', 'YOLO', 'whatever', 'up to you', 'idk', 'surprise me', 'dealer's choice', 'I trust you', 'doesn't matter', 'wing it', 'heart of the cards', 'it's time to duel', or when you are about to arbitrarily pick between 2+ reasonable approaches. Skip when: the user gave clear instructions, or the task is safety-critical (security, data integrity, prod deploy)."
 allowed-tools: Bash Read Grep Glob
 license: CC-BY-SA-4.0
 metadata:
   author: trailofbits
   source: https://github.com/trailofbits/skills/tree/main/plugins/let-fate-decide/skills/let-fate-decide
   tags: arbitration, randomness, tarot, decision-making, playful
+  version: 3
 ---
 
 # Let Fate Decide
 
-When the path forward is unclear, let the cards speak.
+<purpose>
+Inject real entropy into a casual or ambiguous decision by drawing a 4-card Tarot spread and mapping the interpretation to a concrete next step.
+</purpose>
 
-## Quick Start
+<scope>
+  <use_when>
+  - Vague prompts where multiple reasonable approaches exist.
+  - Explicit invocations: "I'm feeling lucky", "let fate decide", "dealer's choice", "surprise me", "whatever you think", "YOLO".
+  - Casual delegation: "whatever", "up to you", "your call", "idk", "just do something", "wing it", "I trust you", "doesn't matter", "any approach works", "you pick".
+  - Yu-Gi-Oh energy: "Heart of the cards", "you've activated my trap card", "it's time to duel".
+  - Shrug-like brevity: very short prompts that fully delegate without expressing a preference.
+  - Redraw requests ("try again", "draw again") when no system changes occurred — draw new cards, do not re-run the same approach.
+  - Tie-breaking: when about to arbitrarily pick between 2+ valid approaches.
+  </use_when>
 
+  <do_not_use_when>
+  - The user has given clear, specific instructions.
+  - The task has a single obvious correct approach.
+  - Safety-critical decisions (security, data integrity, production deployments).
+  - The user explicitly asks not to use Tarot.
+  </do_not_use_when>
+</scope>
+
+<governing_rule>
+The draw must come from real entropy. Never fake a draw or simulate randomness; if the script fails, tell the user. Cards inform direction; they never override user requirements, safety, or correctness.
+</governing_rule>
+
+<working_method>
 1. Run the drawing script:
    ```bash
    uv run --no-config ~/.claude/skills/let-fate-decide/scripts/draw_cards.py
    ```
+2. Read each drawn card's meaning file (paths returned by the script, relative to `~/.claude/skills/let-fate-decide/`). Read all four in parallel when possible.
+3. Synthesize the spread using `references/INTERPRETATION_GUIDE.md`.
+4. Output the interpretation alongside the tool call that implements the chosen option. Never end a turn with interpretation as text only.
+</working_method>
 
-2. The script outputs JSON with 4 drawn cards, each with a `file` path relative to `~/.claude/skills/let-fate-decide/`
+<section name="spread">
+Four positions:
+1. The Context — What is the situation really about?
+2. The Challenge — What obstacle or tension exists?
+3. The Guidance — What approach should be taken?
+4. The Outcome — Where does this path lead?
+</section>
 
-3. Read each card's meaning file to understand the draw
+<section name="deck-layout">
+Card meanings live under `~/.claude/skills/let-fate-decide/cards/`:
+- `cards/major/` — 22 Major Arcana (archetypal forces).
+- `cards/wands/` — 14 Wands (creativity, action, will).
+- `cards/cups/` — 14 Cups (emotion, intuition, relationships).
+- `cards/swords/` — 14 Swords (intellect, conflict, truth).
+- `cards/pentacles/` — 14 Pentacles (material, practical, craft).
+</section>
 
-4. Interpret the spread using the guide at [~/.claude/skills/let-fate-decide/references/INTERPRETATION_GUIDE.md](~/.claude/skills/let-fate-decide/references/INTERPRETATION_GUIDE.md)
+<section name="interpretation-rules">
+- Reversed cards invert or complicate the upright meaning, not "do nothing".
+- Major Arcana cards carry more weight than Minor Arcana.
+- Read the spread as one story across all four positions; do not interpret cards in isolation.
+- Map abstract meanings to concrete technical decisions.
+</section>
 
-5. Apply the interpretation to the task at hand
+<section name="error-handling">
+- Script crashes: report the error and skip the reading. Do not invent cards.
+- Card file missing: interpret from name and suit alone, continue the reading.
+- Never simulate entropy from your own "randomness".
+</section>
 
-## When to Use
+<section name="rationalizations">
+Reject these:
+- "The cards said to, so I must" — cards inform direction; they do not override safety or correctness.
+- "This reading justifies my pre-existing preference" — be honest if the reading challenges your instinct.
+- "The reversed card means do nothing" — reversed means a different angle, not inaction.
+- "Major Arcana overrides user requirements" — user requirements always take priority.
+- "I'll keep drawing until I get what I want" — one draw per decision point; accept the reading.
+</section>
 
-- **Vague prompts**: The user's request is ambiguous and multiple reasonable approaches exist
-- **Explicit invocations**: "I'm feeling lucky", "let fate decide", "dealer's choice", "surprise me", "whatever you think", "YOLO"
-- **Casual delegation**: "whatever", "up to you", "your call", "idk", "just do something", "wing it", "I trust you", "doesn't matter", "do what you want", "I don't care", "any approach works", "you pick"
-- **Yu-Gi-Oh energy**: "Heart of the cards", "I believe in the heart of the cards", "you've activated my trap card", "it's time to duel"
-- **Shrug-like brevity**: Very short prompts that fully delegate the decision without expressing a preference
-- **Redraw requests**: "Try again" or "draw again" when no actual system changes occurred (this means draw new cards, not re-run the same approach)
-- **Tie-breaking**: When you are about to arbitrarily pick between 2+ valid approaches, draw cards instead of silently choosing one
+<section name="how-it-works">
+The script uses Python's `secrets` for cryptographic randomness:
+1. Builds a 78-card deck (22 Major + 56 Minor).
+2. Fisher-Yates shuffle via `secrets.randbelow()` (no modulo bias).
+3. Draws 4 cards from the top.
+4. Each card independently has a 50% chance of being reversed.
+</section>
 
-## When NOT to Use
-
-- The user has given clear, specific instructions
-- The task has a single obvious correct approach
-- Safety-critical decisions (security, data integrity, production deployments)
-- The user explicitly asks you NOT to use Tarot
-- The user's tone is precision-seeking rather than casual -- use `ask-questions-if-underspecified` instead to gather actual requirements
-
-## How It Works
-
-### The Draw
-
-The script uses `secrets` for cryptographic randomness:
-
-1. Builds a standard 78-card Tarot deck (22 Major Arcana + 56 Minor Arcana)
-2. Performs a Fisher-Yates shuffle via `secrets.randbelow()` (no modulo bias)
-3. Draws 4 cards from the top
-4. Each card independently has a 50% chance of being reversed
-
-### The Spread
-
-The 4 card positions represent:
-
-| Position | Represents | Question It Answers |
-|----------|-----------|-------------------|
-| 1 | **The Context** | What is the situation really about? |
-| 2 | **The Challenge** | What obstacle or tension exists? |
-| 3 | **The Guidance** | What approach should be taken? |
-| 4 | **The Outcome** | Where does this path lead? |
-
-### Card Files
-
-Each card's meaning is in its own markdown file under `~/.claude/skills/let-fate-decide/cards/`:
-
-- `cards/major/` - 22 Major Arcana (archetypal forces)
-- `cards/wands/` - 14 Wands (creativity, action, will)
-- `cards/cups/` - 14 Cups (emotion, intuition, relationships)
-- `cards/swords/` - 14 Swords (intellect, conflict, truth)
-- `cards/pentacles/` - 14 Pentacles (material, practical, craft)
-
-### Interpretation
-
-After drawing, read each card's file and synthesize meaning. See [~/.claude/skills/let-fate-decide/references/INTERPRETATION_GUIDE.md](~/.claude/skills/let-fate-decide/references/INTERPRETATION_GUIDE.md) for the full interpretation workflow.
-
-Key rules:
-- Reversed cards invert or complicate the upright meaning
-- Major Arcana cards carry more weight than Minor Arcana
-- The spread tells a story across all 4 positions; don't interpret cards in isolation
-- Map abstract meanings to concrete technical decisions
-- **Never output interpretation as a text-only turn.** Include the
-  interpretation alongside your next tool call (the action that
-  implements the chosen option). Read all 4 cards in parallel if
-  possible.
-
-## Example Session
-
-```
+<section name="example">
 User: "I dunno, just make it work somehow"
 
-[Draw cards]
-1. The Magician (upright) - Context: All tools are available
-2. Five of Swords (reversed) - Challenge: Let go of a combative approach
-3. The Star (upright) - Guidance: Follow the aspirational path
-4. Ten of Pentacles (upright) - Outcome: Long-term stability
+Draw:
+1. The Magician (upright) — Context: all tools are available.
+2. Five of Swords (reversed) — Challenge: let go of a combative approach.
+3. The Star (upright) — Guidance: follow the aspirational path.
+4. Ten of Pentacles (upright) — Outcome: long-term stability.
 
-Interpretation: The cards suggest you have everything you need (Magician).
-The challenge is avoiding overengineering or adversarial thinking about edge
-cases (Five of Swords reversed). Follow the clean, hopeful approach (Star)
-and build for lasting maintainability (Ten of Pentacles).
+Interpretation: You have what you need (Magician). Avoid overengineering or adversarial thinking about edge cases (Five of Swords reversed). Follow the clean, hopeful approach (Star) and build for lasting maintainability (Ten of Pentacles).
 
-Approach: Implement the simplest correct solution with clear structure,
-prioritizing long-term readability over clever optimizations.
-```
+Approach: implement the simplest correct solution with clear structure, prioritizing long-term readability over clever optimizations.
+</section>
 
-## Error Handling
-
-If the drawing script fails:
-- **Script crashes with traceback**: Report the error to the user and skip the reading. Do not invent cards or simulate a draw — the whole point is real entropy.
-- **Card file not found**: Note the missing file, interpret the card from its name and suit alone, and continue with the reading.
-- **Never fake entropy**: If the script cannot run, do not simulate a draw using your own "randomness." Tell the user the draw failed.
-
-## Rationalizations to Reject
-
-| Rationalization | Why Wrong |
-|----------------|-----------|
-| "The cards said to, so I must" | Cards inform direction, they don't override safety or correctness |
-| "This reading justifies my pre-existing preference" | Be honest if the reading challenges your instinct |
-| "The reversed card means do nothing" | Reversed means a different angle, not inaction |
-| "Major Arcana overrides user requirements" | User requirements always take priority over card readings |
-| "I'll keep drawing until I get what I want" | One draw per decision point; accept the reading |
+<bundled_resources>
+- `references/INTERPRETATION_GUIDE.md` — full interpretation workflow.
+- `cards/{major,wands,cups,swords,pentacles}/*.md` — per-card meaning files.
+- `scripts/draw_cards.py` — the drawing script.
+</bundled_resources>

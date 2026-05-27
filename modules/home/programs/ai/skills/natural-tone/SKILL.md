@@ -1,10 +1,11 @@
 ---
 name: natural-tone
-description: "Edit prose to read as human, not AI-generated. Replace filler, hedging, marketing voice, and AI tells (em dashes, monotonous openers, padded three-item lists, restated claims, stacked adjectives) with concrete actions, named actors, scoped claims, and evidence. Use when: tightening docs, READMEs, PR descriptions, commit messages, release notes, technical notes, code comments, Slack or email drafts, or AI-generated text that sounds robotic, formulaic, hedged, promotional, or vague."
+description: "Edit prose so it reads as human, not AI-generated: replace filler, hedging, marketing voice, and AI tells (em dashes, monotonous openers, padded three-item lists, restated claims, stacked adjectives) with concrete actors, scoped claims, and evidence. Triggers: tightening READMEs, PR descriptions, commit-message bodies, release notes, issue summaries, code comments, Slack or email drafts, or any AI-generated text that sounds robotic, formulaic, hedged, promotional, or vague. Skip when: defining API contracts, or writing terse labels/identifiers where exact syntax matters more than tone."
 license: AGPL-3.0-only
 metadata:
   author: marcodsl
   tags: writing, editing, prose, documentation
+  version: 3
 ---
 
 # Natural Tone
@@ -24,7 +25,6 @@ Rewrite prose so readers can see who does what, what changes, and why it matters
   </use_when>
 
   <do_not_use_when>
-  - Designing prompts, agent instructions, or system-instruction architecture. Use `prompt-engineering` for prompt structure and agent behavior; use this skill to tighten the prose inside those artifacts.
   - Defining API contracts, schema semantics, or implementation behavior where the main task is design accuracy rather than prose quality.
   - Writing terse labels, identifiers, table cells, diagram labels, or machine-oriented fields where exact syntax matters more than tone or flow.
   </do_not_use_when>

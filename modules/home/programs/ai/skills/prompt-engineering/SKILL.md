@@ -1,10 +1,11 @@
 ---
 name: prompt-engineering
-description: "Write and review LLM prompts and coding-agent instruction files. Use when: editing system prompts, agent rules, SKILL.md, .instructions.md, .agent.md, .prompt.md, or .mdc files."
+description: "Write and review LLM prompts and coding-agent instruction files: tighten routing in name/description, behavior defaults, output format constraints, tool-use phrasing, and verification. Triggers: editing system or developer prompts, agent rules, persona files, or files like `SKILL.md`, `CLAUDE.md`, `AGENTS.md`, `GEMINI.md`, `.instructions.md`, `.agent.md`, `.prompt.md`, `.mdc`."
 license: AGPL-3.0-only
 metadata:
   author: marcodsl
   tags: prompts, agents, instructions
+  version: 3
 ---
 
 # Prompt Engineering
@@ -21,11 +22,6 @@ Turn vague prompt ideas into explicit instructions that control output, tool use
   - Reviewing coding-agent customization files such as `SKILL.md`, `.instructions.md`, `.agent.md`, `.prompt.md`, and `.mdc`.
   - Fixing weak routing, over-aggressive tool rules, vague constraints, or portability problems across agent apps.
   </use_when>
-
-  <do_not_use_when>
-  - The task is only tightening prose or removing filler without changing prompt structure. Use `natural-tone` for tone-only edits.
-  - The task is mainly a language, framework, or product implementation problem and only touches prompts incidentally. Use the domain skill first and apply this one underneath it.
-  </do_not_use_when>
 </scope>
 
 <governing_rule>

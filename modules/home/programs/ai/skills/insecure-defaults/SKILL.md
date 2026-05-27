@@ -1,84 +1,82 @@
 ---
 name: insecure-defaults
-description: "Detects fail-open insecure defaults (hardcoded secrets, weak auth, permissive security) that allow apps to run insecurely in production. Use when auditing security, reviewing config management, or analyzing environment variable handling."
+description: "Detect fail-open insecure defaults that let apps run insecurely in production, distinguishing them from fail-secure code that crashes on missing config. Triggers: `process.env.X || 'default'`, `getenv(...) or '...'`, `ENV.fetch(..., default:)`, hardcoded `password`/`api_key`/`JWT_SECRET`, `DEBUG=true`, `AUTH_REQUIRED=false`, `verify_ssl: false`, CORS `*`, permissions `0777`, MD5/SHA1/DES/RC4/ECB in security contexts, security audit of config or env handling. Skip when: the file is a test fixture, `.example`/`.template`/`.sample` file, dev-only Docker Compose, or documentation snippet."
 allowed-tools: Read Grep Glob Bash
 license: CC-BY-SA-4.0
 metadata:
   author: trailofbits
   source: https://github.com/trailofbits/skills/tree/main/plugins/insecure-defaults/skills/insecure-defaults
   tags: security, audit, secrets, configuration, fail-open, hardcoded-credentials
+  version: 3
 ---
 
 # Insecure Defaults Detection
 
-Finds **fail-open** vulnerabilities where apps run insecurely with missing configuration. Distinguishes exploitable defaults from fail-secure patterns that crash safely.
+<purpose>
+Find fail-open vulnerabilities where apps run insecurely with missing configuration. Distinguish exploitable defaults from fail-secure patterns that crash safely.
+</purpose>
 
-- **Fail-open (CRITICAL):** `SECRET = env.get('KEY') or 'default'` → App runs with weak secret
-- **Fail-secure (SAFE):** `SECRET = env['KEY']` → App crashes if missing
+<scope>
+  <use_when>
+  - Security audits of production applications (auth, crypto, API security).
+  - Configuration review of deployment files, IaC templates, Docker configs.
+  - Code review of environment variable handling and secrets management.
+  - Pre-deployment checks for hardcoded credentials or weak defaults.
+  </use_when>
 
-## When to Use
+  <do_not_use_when>
+  - Test fixtures scoped to test environments (`test/`, `spec/`, `__tests__/`).
+  - Example or template files (`.example`, `.template`, `.sample`).
+  - Development-only tools (local Docker Compose for dev, debug scripts).
+  - Documentation examples in README.md or `docs/`.
+  - Build-time configuration replaced during deployment.
+  - Crash-on-missing behavior where the app cannot start without proper config (fail-secure).
+  </do_not_use_when>
+</scope>
 
-- **Security audits** of production applications (auth, crypto, API security)
-- **Configuration review** of deployment files, IaC templates, Docker configs
-- **Code review** of environment variable handling and secrets management
-- **Pre-deployment checks** for hardcoded credentials or weak defaults
+<governing_rule>
+A default is a finding only when production code paths actually run with it. Trace the code path to decide between fail-open (CRITICAL) and fail-secure (safe).
 
-## When NOT to Use
+- Fail-open (critical): `SECRET = env.get('KEY') or 'default'` → app runs with weak secret.
+- Fail-secure (safe): `SECRET = env['KEY']` → app crashes if missing.
+</governing_rule>
 
-Do not use this skill for:
-- **Test fixtures** explicitly scoped to test environments (files in `test/`, `spec/`, `__tests__/`)
-- **Example/template files** (`.example`, `.template`, `.sample` suffixes)
-- **Development-only tools** (local Docker Compose for dev, debug scripts)
-- **Documentation examples** in README.md or docs/ directories
-- **Build-time configuration** that gets replaced during deployment
-- **Crash-on-missing behavior** where app won't start without proper config (fail-secure)
+<working_method>
+1. SEARCH: discover language, framework, and conventions. Locate secret storage, credentialed integrations, crypto usage, and config files. Run targeted searches in production-reachable code (not tests or examples).
+2. VERIFY: trace each match. When does it execute (startup vs runtime)? What happens with the variable missing? Is there validation enforcing secure config?
+3. CONFIRM: determine production impact. If production config supplies the variable, lower severity but still flag the code-level vulnerability. If config is missing or uses the default, mark critical.
+4. REPORT: include location, pattern, verification trace, production impact, and exploitation path.
+</working_method>
 
-When in doubt: trace the code path to determine if the app runs with the default or crashes.
+<section name="search-patterns">
+Focus searches in `**/config/`, `**/auth/`, `**/database/`, and env files:
+- Fallback secrets: `getenv.*\) or ['"]`, `process\.env\.[A-Z_]+ \|\| ['"]`, `ENV\.fetch.*default:`.
+- Hardcoded credentials: `password.*=.*['"][^'"]{8,}['"]`, `api[_-]?key.*=.*['"][^'"]+['"]`.
+- Weak defaults: `DEBUG.*=.*true`, `AUTH.*=.*false`, `CORS.*=.*\*`.
+- Crypto algorithms: `MD5|SHA1|DES|RC4|ECB` in security contexts.
 
-## Rationalizations to Reject
+Tailor the approach based on discovery. Focus on production-reachable code, not test fixtures or example files.
+</section>
 
-- **"It's just a development default"** → If it reaches production code, it's a finding
-- **"The production config overrides it"** → Verify prod config exists; code-level vulnerability remains if not
-- **"This would never run without proper config"** → Prove it with code trace; many apps fail silently
-- **"It's behind authentication"** → Defense in depth; compromised session still exploits weak defaults
-- **"We'll fix it before release"** → Document now; "later" rarely comes
+<section name="finding-categories">
+- Fallback secrets (`SECRET = env.get(X) or Y`): verify app starts without env var and secret is used in crypto/auth. Skip tests and examples.
+- Default credentials (hardcoded `username`/`password` pairs): verify active in deployed config with no runtime override. Skip disabled accounts and documentation.
+- Fail-open security (`AUTH_REQUIRED = env.get(X, 'false')`): verify default is insecure. Safe when app crashes or default is secure.
+- Weak crypto (MD5/SHA1/DES/RC4/ECB in security contexts): verify use for passwords, encryption, or tokens. Skip checksums and non-security hashing.
+- Permissive access (CORS `*`, permissions `0777`, public-by-default): verify the default allows unauthorized access. Skip explicitly justified permissiveness.
+- Debug features (stack traces, introspection, verbose errors): verify enabled by default and exposed in responses. Skip logging-only.
+</section>
 
-## Workflow
+<section name="rationalizations">
+Reject these excuses:
+- "It's just a development default" → if it reaches production code, it's a finding.
+- "The production config overrides it" → verify prod config exists; the code-level vulnerability remains otherwise.
+- "This would never run without proper config" → prove it with a code trace; many apps fail silently.
+- "It's behind authentication" → defense in depth; a compromised session still exploits weak defaults.
+- "We'll fix it before release" → document now; "later" rarely comes.
+</section>
 
-Follow this workflow for every potential finding:
-
-### 1. SEARCH: Perform Project Discovery and Find Insecure Defaults
-
-Determine language, framework, and project conventions. Use this information to further discover things like secret storage locations, secret usage patterns, credentialed third-party integrations, cryptography, and any other relevant configuration. Further use information to analyze insecure default configurations.
-
-**Example**
-Search for patterns in `**/config/`, `**/auth/`, `**/database/`, and env files:
-- **Fallback secrets:** `getenv.*\) or ['"]`, `process\.env\.[A-Z_]+ \|\| ['"]`, `ENV\.fetch.*default:`
-- **Hardcoded credentials:** `password.*=.*['"][^'"]{8,}['"]`, `api[_-]?key.*=.*['"][^'"]+['"]`
-- **Weak defaults:** `DEBUG.*=.*true`, `AUTH.*=.*false`, `CORS.*=.*\*`
-- **Crypto algorithms:** `MD5|SHA1|DES|RC4|ECB` in security contexts
-
-Tailor search approach based on discovery results.
-
-Focus on production-reachable code, not test fixtures or example files.
-
-### 2. VERIFY: Actual Behavior
-For each match, trace the code path to understand runtime behavior.
-
-**Questions to answer:**
-- When is this code executed? (Startup vs. runtime)
-- What happens if a configuration variable is missing?
-- Is there validation that enforces secure configuration?
-
-### 3. CONFIRM: Production Impact
-Determine if this issue reaches production:
-
-If production config provides the variable → Lower severity (but still a code-level vulnerability)
-If production config missing or uses default → CRITICAL
-
-### 4. REPORT: with Evidence
-
-**Example report:**
+<section name="report-format">
 ```
 Finding: Hardcoded JWT Secret Fallback
 Location: src/auth/jwt.ts:15
@@ -88,31 +86,16 @@ Verification: App starts without JWT_SECRET; secret used in jwt.sign() at line 4
 Production Impact: Dockerfile missing JWT_SECRET
 Exploitation: Attacker forges JWTs using 'default', gains unauthorized access
 ```
+</section>
 
-## Quick Verification Checklist
+<review_checklist>
+- Each finding sits in production-reachable code, not tests or examples.
+- Each finding has a traced runtime behavior, not just a pattern match.
+- Each finding distinguishes fail-open from fail-secure.
+- Rationalizations rejected when applicable.
+- Report names location, pattern, verification, production impact, and exploitation path.
+</review_checklist>
 
-**Fallback Secrets:** `SECRET = env.get(X) or Y`
-→ Verify: App starts without env var? Secret used in crypto/auth?
-→ Skip: Test fixtures, example files
-
-**Default Credentials:** Hardcoded `username`/`password` pairs
-→ Verify: Active in deployed config? No runtime override?
-→ Skip: Disabled accounts, documentation examples
-
-**Fail-Open Security:** `AUTH_REQUIRED = env.get(X, 'false')`
-→ Verify: Default is insecure (false/disabled/permissive)?
-→ Safe: App crashes or default is secure (true/enabled/restricted)
-
-**Weak Crypto:** MD5/SHA1/DES/RC4/ECB in security contexts
-→ Verify: Used for passwords, encryption, or tokens?
-→ Skip: Checksums, non-security hashing
-
-**Permissive Access:** CORS `*`, permissions `0777`, public-by-default
-→ Verify: Default allows unauthorized access?
-→ Skip: Explicitly configured permissiveness with justification
-
-**Debug Features:** Stack traces, introspection, verbose errors
-→ Verify: Enabled by default? Exposed in responses?
-→ Skip: Logging-only, not user-facing
-
-For detailed examples and counter-examples, see [examples.md](references/examples.md).
+<bundled_resources>
+- `references/examples.md` — detailed examples and counter-examples per finding category.
+</bundled_resources>
