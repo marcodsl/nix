@@ -27,6 +27,16 @@
     '';
   };
 
+  pushoverHook = pkgs.writeShellApplication {
+    name = "claude-pushover-hook";
+    runtimeInputs = [pkgs.curl pkgs.jq pkgs.coreutils pkgs.inetutils];
+    text = ''
+      export PUSHOVER_TOKEN_FILE=${config.sops.secrets."pushover/api_token".path}
+      export PUSHOVER_USER_FILE=${config.sops.secrets."pushover/user_key".path}
+      ${builtins.readFile ./hooks/pushover-notify.sh}
+    '';
+  };
+
   # Claude reads the OTEL exporter endpoint from its own process env; the URL
   # is tenant-identifying so it's kept in sops and sourced at launch time.
   claudeWrapped = pkgs.symlinkJoin {
@@ -123,16 +133,31 @@
     };
 
     enabledMcpjsonServers = lib.attrNames config.programs.mcp.servers;
-    hooks.Stop = [
-      {
-        hooks = [
-          {
-            type = "command";
-            command = lib.getExe stopHook;
-          }
-        ];
-      }
-    ];
+    hooks = {
+      Stop = [
+        {
+          hooks = [
+            {
+              type = "command";
+              command = lib.getExe stopHook;
+            }
+          ];
+        }
+      ];
+      Notification = [
+        {
+          matcher = "permission_prompt|idle_prompt|elicitation_dialog";
+          hooks = [
+            {
+              type = "command";
+              command = lib.getExe pushoverHook;
+              async = true;
+              timeout = 10;
+            }
+          ];
+        }
+      ];
+    };
   };
 
   jsonFormat = pkgs.formats.json {};
@@ -230,7 +255,7 @@ in {
   # Upstream symlinks settings.json to a read-only /nix/store path; claude
   # needs to write runtime preferences into it, so suppress the symlink and
   # let the activation script below materialise a regular file instead.
-  home.file."${claudeHomeRel}/settings.json".enable = lib.mkForce false;
+  home.file."${userSettingsPath}".enable = lib.mkForce false;
 
   home.activation.mergeClaudeSettings = lib.hm.dag.entryAfter ["writeBoundary"] ''
     $DRY_RUN_CMD ${lib.getExe mergeScript} \

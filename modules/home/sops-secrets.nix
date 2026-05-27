@@ -17,6 +17,9 @@
       "betterstack/claude_source_token" = {};
       "betterstack/claude_otel_endpoint" = {};
 
+      "pushover/api_token" = {};
+      "pushover/user_key" = {};
+
       "senpai/password" = {};
     };
 
