@@ -126,7 +126,7 @@ def _urlopen_https(url: str):
         raise ValueError(f"refusing to fetch non-https URL: {url!r}")
 
     # nosemgrep: python.lang.security.audit.dynamic-urllib-use-detected.dynamic-urllib-use-detected
-    return urllib.request.urlopen(url)
+    return urllib.request.urlopen(url, timeout=30)
 
 
 def prefetch(url: str) -> str:
