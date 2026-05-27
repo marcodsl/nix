@@ -5,6 +5,7 @@
     ./astral.nix
     ./chromium-wayland.nix
     ./delta.nix
+    ./devenv.nix
     ./direnv.nix
     ./firefox.nix
     ./gh.nix
