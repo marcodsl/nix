@@ -92,7 +92,7 @@ def binary_url(version: str, platform: str) -> str:
 
 def fetch_json(url: str) -> dict:
     # nosemgrep: python.lang.security.audit.dynamic-urllib-use-detected.dynamic-urllib-use-detected
-    with urllib.request.urlopen(url) as response:
+    with urllib.request.urlopen(url, timeout=30) as response:
         return json.load(response)
 
 
