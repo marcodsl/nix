@@ -2,6 +2,7 @@
   imports = [
     ./aliases.nix
     ./cliff.nix
+    ./difftastic.nix
     ./ignores.nix
     ./settings.nix
   ];
