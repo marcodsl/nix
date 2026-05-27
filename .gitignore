@@ -16,13 +16,9 @@ packages/burp-suite-pro/*
 packages/falcon-sensor/*
 !packages/**/.gitkeep
 
-
-
 # AI tools
-.claude/
 .copilot-memory/
 .codex
-CLAUDE.md
 
 # Python bytecode caches
 __pycache__/
