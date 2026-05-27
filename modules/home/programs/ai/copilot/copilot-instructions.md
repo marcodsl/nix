@@ -27,8 +27,6 @@ Use a local skill under `$HOME/.copilot/skills` when the request matches it:
 - `pressure-test`: challenge a proposal or design through focused assumption/tradeoff review.
 - `prompt-engineering`: system prompts, agent rules, instruction files, `SKILL.md`, `.agent.md`, `.prompt.md`, `.mdc`, coding-agent config.
 - `react-guidelines`: React 19+ components/hooks, server/client boundaries, compiler, Actions, Suspense, component tests.
-- `refactor-planning`: concrete refactor plans, RFC-style decisions, small safe commit breakdowns.
-- `rules-distill`: extract cross-cutting rules from multiple skills or promote repeated guidance.
 
 ## Disambiguation
 
