@@ -24,6 +24,7 @@
   config = {
     home.packages = with pkgs; [
       graphrag
+      ona
       playwright-cli
       skills-ref
     ];

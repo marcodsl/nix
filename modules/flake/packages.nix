@@ -155,6 +155,7 @@
         claude-code = pkgs.callPackage "${self}/packages/claude-code" {};
         codex = pkgs.callPackage "${self}/packages/codex" {};
         graphrag = pkgs.callPackage "${self}/packages/graphrag" {};
+        ona = pkgs.callPackage "${self}/packages/ona" {};
         playwright-cli = pkgs.callPackage "${self}/packages/playwright-cli" {};
         skills-ref = pkgs.callPackage "${self}/packages/skills-ref" {};
       }

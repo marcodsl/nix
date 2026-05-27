@@ -1,0 +1,17 @@
+{
+  "version": "20260522.11804.0",
+  "platforms": {
+    "linux-amd64": {
+      "checksum": "1ag3xw5k0ynnqvhn5ksaqq6vxjrzmhbikrgb32qfj8rw63jlivi5"
+    },
+    "linux-arm64": {
+      "checksum": "0qvp0c52rksvi1v52r05vaknl2jbrw0mn7sb48zhzpfprlybp573"
+    },
+    "darwin-amd64": {
+      "checksum": "1x8898y2zq1k4qxf5914k1lp5labl80j9f13nym11a4ylcixcivk"
+    },
+    "darwin-arm64": {
+      "checksum": "0hv74r3y7rlykc1lr2xphi88xmpfcnc5swxyg6ssxa7yy3k93jd8"
+    }
+  }
+}
