@@ -63,7 +63,7 @@
       nuclei
       nuclei-templates
       sqlmap
-      wapiti
+      # wapiti
       wpscan
 
       # Proxying & traffic analysis

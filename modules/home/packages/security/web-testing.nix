@@ -6,7 +6,7 @@
     nuclei
     nuclei-templates
     sqlmap
-    wapiti
+    # wapiti
     wpscan
   ];
 }
