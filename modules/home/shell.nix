@@ -55,7 +55,11 @@
     starship = {
       enable = true;
 
+      presets = ["no-runtime-versions"];
+
       settings = {
+        scan_timeout = 500;
+
         username = {
           style_user = "blue bold";
           style_root = "red bold";
@@ -70,6 +74,12 @@
           format = "on [$hostname](bold red) ";
           trim_at = ".local";
           disabled = false;
+        };
+
+        nix_shell = {
+          impure_msg = "";
+          pure_msg = "pure ";
+          format = "via [$symbol$state(\($name\))]($style) ";
         };
       };
     };
