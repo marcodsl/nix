@@ -95,19 +95,15 @@
     language = "english";
     useAutoModeDuringPlan = true;
 
-    permissions.disableBypassPermissionsMode = "disable";
-
     teammateMode = "auto";
 
     worktree.symlinkDirectories = [
-      "node_modules"
-      ".envrc"
-      ".direnv"
-      ".env"
-      ".env.local"
-      ".CLAUDE.md"
       ".claude"
+      ".env.local"
+      ".env"
       ".vscode"
+      "CLAUDE.local.md"
+      "node_modules"
     ];
 
     otelHeadersHelper = lib.getExe otelHeadersHelper;
