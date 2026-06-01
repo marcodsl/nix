@@ -25,6 +25,24 @@ in {
 
       kernelParams = [
         "transparent_hugepage=madvise"
+
+        # Crash capture via pstore/ramoops. nix-mineral disables the efi-pstore
+        # and ERST backends (efi_pstore.pstore_disable=1, erst_disable), so a
+        # kernel oops/panic is otherwise never recorded. ramoops is an
+        # independent backend that writes to a reserved RAM region surviving a
+        # warm reboot; combined with nix-mineral's oops=panic + panic=-1 an oops
+        # triggers an automatic warm reboot and the dump is recovered on the
+        # next boot. NixOS already wires systemd-pstore.service (sysinit.target)
+        # to archive /sys/fs/pstore into /var/lib/systemd/pstore, so no extra
+        # service config is needed. reserve_mem names the region so the kernel
+        # picks a safe physical address (no hardcoding).
+        # Note: a cold power-cycle loses RAM, and a silent hard lockup never
+        # reaches kmsg_dump, so neither is captured by this.
+        "reserve_mem=2M:4096:oops"
+        "ramoops.mem_name=oops"
+        "ramoops.record_size=0x20000"
+        "ramoops.console_size=0x20000"
+        "ramoops.ecc=1"
       ];
 
       kernel.sysctl = flattenAttrs' {
@@ -75,7 +93,7 @@ in {
       amdgpu.initrd.enable = true;
     };
 
-    boot.kernelModules = ["tcp_bbr"];
+    boot.kernelModules = ["tcp_bbr" "ramoops"];
 
     services.udev.extraRules = ''
       ACTION=="add|change", KERNEL=="nvme[0-9]*n[0-9]*", ATTR{queue/scheduler}="none", ATTR{queue/read_ahead_kb}="256"
