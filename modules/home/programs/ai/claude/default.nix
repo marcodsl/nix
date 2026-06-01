@@ -146,7 +146,7 @@
       ];
       Notification = [
         {
-          matcher = "permission_prompt|idle_prompt|elicitation_dialog";
+          matcher = "";
           hooks = [
             {
               type = "command";
