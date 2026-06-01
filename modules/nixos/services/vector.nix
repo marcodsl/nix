@@ -2,9 +2,17 @@
 {
   config,
   lib,
+  pkgs,
+  flake,
   ...
 }: let
   cfg = config.marco.services.vector;
+  # vector 0.55.0 on nixos-unstable fails to build: the unstable_name_collisions
+  # lint + #![deny(warnings)] in vector-config (merge.rs:265). Pin to stable
+  # (0.52.0, cached by Hydra) until unstable's vector compiles again, then revert.
+  stablePkgs = import flake.inputs.nixpkgs-stable {
+    inherit (pkgs.stdenv.hostPlatform) system;
+  };
   noisePredicates = [
     {
       name = "is_webview_preload";
@@ -52,6 +60,7 @@ in {
   config = lib.mkIf cfg.enable {
     services.vector = {
       enable = true;
+      package = stablePkgs.vector;
       journaldAccess = true;
 
       # Disabled because URI and token use ${ENV} interpolation that is only
