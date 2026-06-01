@@ -26,6 +26,8 @@ buildNpmPackage rec {
 
   dontNpmBuild = true;
 
+  passthru.updateScript = ./update.py;
+
   meta = {
     description = "Playwright CLI for coding agents - browser automation via concise commands";
     homepage = "https://github.com/microsoft/playwright-cli";
