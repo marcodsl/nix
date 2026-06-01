@@ -201,13 +201,6 @@ in {
     commandsDir = ./commands;
 
     agents = {
-      researcher = mkClaudeAgent {
-        name = "researcher";
-        description = "Research subagent that executes thorough searches based on main agent instructions. Searches GitHub repos, fetches files, verifies claims, and reports detailed findings with citations. Designed to work autonomously within a research workflow.";
-        disallowedTools = ["Bash" "Edit"];
-        prompt = builtins.readFile ./agents/researcher.md;
-      };
-
       security-reviewer = mkClaudeAgent {
         name = "security-reviewer";
         description = "Security-focused code review subagent for the consensus-review pipeline. Scans a captured git diff for exploitable vulnerabilities (injection sinks, authn/authz gaps, unsafe crypto, deserialization, SSRF, etc.) and returns JSON findings with mandatory file:line citations and minimal patches. Read-only — does not modify files.";
