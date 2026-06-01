@@ -1,5 +1,7 @@
 {...}: {
   programs.git.ignores = [
+    ".local_gitignore"
+
     # Universal noise
     ".cache/"
     "log/"
