@@ -1,6 +1,8 @@
 # Claude-specific Patterns
 
-This file covers prompt-engineering guidance from the Anthropic best-practices page that is specific to Claude latest models (Opus 4.7, Opus 4.6, Sonnet 4.6, Haiku 4.5) and does not generalize across other agent apps. Use these patterns alongside the portable guidance in `prompt-patterns.md`.
+This file covers prompt-engineering guidance from the Anthropic best-practices page that is specific to Claude latest models (Opus 4.8, Opus 4.7, Opus 4.6, Sonnet 4.6, Haiku 4.5) and does not generalize across other agent apps. Opus 4.8 is the lead model; behaviors are attributed to the specific versions they apply to. Use these patterns alongside the portable guidance in `prompt-patterns.md`.
+
+Opus 4.8 performs well out of the box on existing Opus 4.7 prompts; the patterns below cover the behaviors that most often need tuning on upgrade.
 
 <section name="effort-and-thinking">
 Claude latest models expose an `effort` parameter that trades intelligence against token spend and latency.
@@ -11,17 +13,35 @@ Claude latest models expose an `effort` parameter that trades intelligence again
 - `medium`: cost-sensitive workloads that can trade some intelligence for token savings.
 - `low`: short, scoped, latency-sensitive workloads only.
 
+Opus 4.8 respects effort levels strictly, especially at the low end. At `low` and `medium` it scopes its work to what was asked rather than going above and beyond, which is good for latency and cost but risks under-thinking on moderately complex tasks at `low`. Effort is likely more important for this model than for any prior Opus, so experiment with it actively when you upgrade. If reasoning looks shallow on a complex problem, raise effort to `high` or `xhigh` before prompting around it. If you must keep `low` for latency:
+
+```text
+This task involves multi-step reasoning. Think carefully through the problem before responding.
+```
+
 Pair high effort with a generous `max_tokens` budget (start at 64k) so the model has room to think and act across subagents and tool calls.
 
-Adaptive thinking (`thinking: {type: "adaptive"}`) is the recommended thinking mode. The deprecated `budget_tokens` path on extended thinking still works but should be migrated to effort.
+Adaptive thinking (`thinking: {type: "adaptive"}`) is the recommended thinking mode. On Opus 4.8, thinking is off unless you explicitly set it; adaptive then lets the model decide when and how much to think based on effort and query complexity. The deprecated `budget_tokens` path on extended thinking still works on Opus 4.6 and Sonnet 4.6 but should be migrated to effort.
 
-If the model thinks more than you want with large system prompts:
+If the model thinks more than you want with large or complex system prompts:
 
 ```text
 Thinking adds latency and should only be used when it will meaningfully improve answer quality, typically for problems that require multi-step reasoning. When in doubt, respond directly.
 ```
+</section>
 
-If a moderately complex task underthinks at `medium`, raise effort before prompting around it.
+<section name="response-length-and-verbosity">
+Opus 4.8 calibrates response length to how complex it judges the task to be, rather than defaulting to a fixed verbosity. Expect shorter answers on simple lookups and much longer ones on open-ended analysis. If your product depends on a specific style or verbosity, tune the prompt. To decrease verbosity:
+
+```text
+Provide concise, focused responses. Skip non-essential context, and keep examples minimal.
+```
+
+Positive examples showing the appropriate level of concision tend to be more effective than negative instructions that tell the model what not to do.
+</section>
+
+<section name="tool-use-triggering">
+Opus 4.8 tends to favor reasoning over tool calls, which produces better results in most cases. Increasing the effort setting is the main lever to increase tool usage: `high` or `xhigh` show substantially more tool use in agentic search and coding. Where you want more tool use, also instruct the model explicitly about when and how to use a given tool. For example, if it is not using your web search tools, describe clearly why and how it should.
 </section>
 
 <section name="thinking-tags">
@@ -30,14 +50,22 @@ Use `<thinking>` and `<answer>` tags to separate reasoning from final output. Th
 1. Few-shot examples that demonstrate the reasoning style you want the model to imitate. Include `<thinking>` blocks inside each example and the model will generalize the shape into its own adaptive thinking blocks.
 2. Manual chain-of-thought when adaptive thinking is disabled.
 
-When extended thinking is disabled, Claude is sensitive to the word "think" and its variants, which can cause unintended thinking-mode triggering. Prefer "consider", "evaluate", "reason through", or "work through" in those cases.
+When extended thinking is disabled, Claude Opus 4.5 is particularly sensitive to the word "think" and its variants, which can cause unintended thinking-mode triggering. Prefer "consider", "evaluate", "reason through", or "work through" in those cases.
 </section>
 
 <section name="literal-instruction-following">
-Claude Opus 4.7 interprets prompts more literally than Opus 4.6, particularly at lower effort levels. It will not silently generalize an instruction from one item to another. If you want broad application, state the scope explicitly:
+Opus 4.8 interprets prompts literally and explicitly, particularly at lower effort levels. It does not silently generalize an instruction from one item to another, and it does not infer requests you did not make. The upside is precision and less thrash; it performs well for carefully tuned API prompts, structured extraction, and pipelines where predictable behavior matters. If you want broad application, state the scope explicitly:
 
 ```text
 Apply this formatting to every section, not just the first one.
+```
+</section>
+
+<section name="tone-and-writing-style">
+Opus 4.8 tends toward a direct, opinionated style with minimal validation-forward phrasing and sparing emoji use. Prose style on long-form writing may shift relative to earlier models. If your product relies on a specific voice, re-evaluate style prompts against the new baseline. For a warmer, more conversational voice:
+
+```text
+Use a warm, collaborative tone. Acknowledge the user's framing before answering.
 ```
 </section>
 
@@ -68,20 +96,20 @@ Prefilled assistant responses on the last turn are no longer supported on Claude
 </section>
 
 <section name="user-facing-progress">
-Claude Opus 4.7 produces high-quality progress updates without scaffolding. If your prompt forces interim status messages ("after every 3 tool calls, summarize progress"), remove it; the natural updates are better.
+Opus 4.8 provides more regular, higher-quality progress updates throughout long agentic traces without scaffolding. If your prompt forces interim status messages ("after every 3 tool calls, summarize progress"), remove it; the natural updates are better.
 
 If you need a specific update format, describe it explicitly and provide one or two examples.
 </section>
 
 <section name="frontend-aesthetics">
-Claude Opus 4.7 has a strong default house style (warm cream backgrounds, serif display type, terracotta accents) that reads well for editorial briefs but feels off for dashboards, dev tools, fintech, healthcare, or enterprise apps. Generic instructions like "don't use cream" tend to swap one fixed palette for another rather than producing variety.
+Opus 4.8 has strong design instincts with a persistent default house style: warm cream/off-white backgrounds (~`#F4F1EA`), serif display type (Georgia, Fraunces, Playfair), italic word-accents, and a terracotta/amber accent. It reads well for editorial, hospitality, and portfolio briefs but feels off for dashboards, dev tools, fintech, healthcare, or enterprise apps, and it shows up in slide decks as well as web UIs. Generic instructions like "don't use cream" or "make it clean" tend to swap one fixed palette for another rather than producing variety.
 
 Two reliable counters:
 
-1. Specify a concrete alternative palette, typography system, and layout rules. The model follows explicit specs precisely.
+1. Specify a concrete alternative palette, typography system, and layout rules. The model follows explicit specs precisely. For example: "Use a cold monochrome palette (`#E9ECEC`, `#C9D2D4`, `#8C9A9E`, `#44545B`, `#11171B`), a square angular sans-serif with wide letter-spacing, 4px corner radius, and generous whitespace."
 2. Have the model propose 4 distinct visual directions (background hex, accent hex, typeface, one-line rationale) before building, then implement only the chosen direction. This produces meaningfully different runs and replaces the role that `temperature` once played for design variety.
 
-Snippet to avoid generic aesthetics:
+Opus 4.8 needs less frontend prompting than previous models to avoid the generic "AI slop" aesthetic, so a short snippet is enough:
 
 ```xml
 <frontend_aesthetics>
@@ -91,7 +119,7 @@ NEVER use generic AI-generated aesthetics like overused font families (Inter, Ro
 </section>
 
 <section name="code-review-harnesses">
-Claude Opus 4.7 has higher recall and precision on bug-finding than prior models, but harnesses tuned for earlier models may show measured recall regressions because the model follows severity filters faithfully. Move filtering out of the finding stage:
+Opus 4.8 is meaningfully better at finding bugs than prior models, with both higher recall and precision in internal evals. Harnesses tuned for earlier models may show measured recall regressions because the model follows severity filters faithfully: when a prompt says "only report high-severity issues" or "don't nitpick", it investigates just as thoroughly but reports fewer low-severity findings. This is a harness effect, not a capability regression. Move filtering out of the finding stage:
 
 ```text
 Report every issue you find, including ones you are uncertain about or consider low-severity. Do not filter for importance or confidence at this stage; a separate verification step will do that. Your goal here is coverage: it is better to surface a finding that later gets filtered out than to silently drop a real bug. For each finding, include your confidence level and an estimated severity so a downstream filter can rank them.
@@ -100,17 +128,21 @@ Report every issue you find, including ones you are uncertain about or consider 
 If you want single-pass filtering, define the bar concretely instead of with qualitative terms like "important": for example, "Report bugs that could cause incorrect behavior, a test failure, or a misleading result; only omit nits like pure style or naming preferences."
 </section>
 
+<section name="interactive-coding">
+Opus 4.8 is more autonomous than prior models and uses more tokens in interactive, multi-turn coding settings because it reasons more after each user turn. To maximize both performance and token efficiency, specify the task, intent, and relevant constraints upfront in the first turn, prefer `xhigh` or `high` effort, add autonomous features like an auto mode, and reduce the number of required human interactions. Ambiguous prompts conveyed progressively over many turns tend to reduce token efficiency and sometimes performance.
+</section>
+
 <section name="model-identification">
 For products that need the model to identify itself, add a short system-prompt line:
 
 ```text
-The assistant is Claude, created by Anthropic. The current model is Claude Opus 4.7.
+The assistant is Claude, created by Anthropic. The current model is Claude Opus 4.8.
 ```
 
 If the app needs the exact API model string:
 
 ```text
-When an LLM is needed, default to Claude Opus 4.7 unless the user requests otherwise. The exact model string is claude-opus-4-7.
+When an LLM is needed, default to Claude Opus 4.8 unless the user requests otherwise. The exact model string is claude-opus-4-8.
 ```
 </section>
 
@@ -128,15 +160,15 @@ Avoid over-engineering. Only make changes that are directly requested or clearly
 </section>
 
 <section name="subagent-control">
-Claude 4.6 has a strong predilection for spawning subagents and may overuse them. Claude 4.7 spawns fewer by default but is still steerable.
+Opus 4.8 tends to spawn fewer subagents by default, but the behavior is steerable. Give it explicit guidance about when subagents are desirable.
 
-If you see excessive subagent calls, scope them:
+To scope subagents down:
 
 ```text
 Use subagents when tasks can run in parallel, require isolated context, or involve independent workstreams that do not need to share state. For simple tasks, sequential operations, single-file edits, or tasks where you need to maintain context across steps, work directly rather than delegating.
 ```
 
-If you want more subagent fan-out on 4.7:
+To get more subagent fan-out:
 
 ```text
 Spawn multiple subagents in the same turn when fanning out across items or reading multiple files. Do not spawn a subagent for work you can complete directly in a single response.

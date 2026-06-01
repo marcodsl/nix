@@ -5,7 +5,7 @@ license: AGPL-3.0-only
 metadata:
   author: marcodsl
   tags: prompts, agents, instructions
-  version: 3
+  version: 4
 ---
 
 # Prompt Engineering
@@ -85,5 +85,5 @@ Say exactly what you want, in the layer that controls that behavior, and write t
 <bundled_resources>
 - `references/prompt-patterns.md` for prompt structure, long-context patterns, tool-use phrasing, reasoning controls, and the generalizable agentic patterns (grounding, autonomy and safety, state tracking).
 - `references/customization-files.md` for skill layout, instruction-layer precedence, portability rules, and file-type-specific guidance.
-- `references/claude-specific.md` for Claude-only patterns: effort and adaptive thinking, `<thinking>` tag conventions, prefill migration, frontend aesthetics, code-review harness tuning, and other Claude-latest-model specifics.
+- `references/claude-specific.md` for Claude-only patterns (Opus 4.8 lead): effort and adaptive thinking, response verbosity, tool-use triggering, literal instruction following, tone, prefill migration, frontend aesthetics, code-review harness tuning, interactive coding, and other Claude-latest-model specifics.
 </bundled_resources>
