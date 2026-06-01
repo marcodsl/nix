@@ -16,6 +16,7 @@
     # Shell utilities
     curl
     fd
+    go-task
     just
     jq
     unzip

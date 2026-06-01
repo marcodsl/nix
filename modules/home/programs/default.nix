@@ -1,6 +1,7 @@
 {...}: {
   imports = [
     ./ai
+    ./git
 
     ./astral.nix
     ./chromium-wayland.nix
@@ -10,7 +11,7 @@
     ./firefox.nix
     ./gh.nix
     ./ghostty.nix
-    ./git
+    ./go-task.nix
     ./jujutsu.nix
     ./k9s.nix
     ./mullvad.nix

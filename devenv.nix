@@ -6,8 +6,7 @@
     age
     alejandra
     git
-    just
-    just-lsp
+    go-task
     nh
     nil
     nixd

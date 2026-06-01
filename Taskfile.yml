@@ -1,0 +1,64 @@
+# https://taskfile.dev
+version: "3"
+
+tasks:
+  default:
+    desc: List available tasks
+    silent: true
+    cmds:
+      - task --list
+
+  update:
+    desc: 'Update nix flake inputs (default: nixpkgs; "-- all" for everything; "-- a,b" for a subset)'
+    silent: true
+    cmds:
+      # go-task runs cmds through an embedded POSIX shell (mvdan/sh), not bash,
+      # so split the comma-separated input via positional params instead of `read -a`.
+      - |
+        set -euo pipefail
+        input="{{.CLI_ARGS}}"
+        if [ -z "$input" ]; then
+          nix flake update nixpkgs
+        elif [ "$input" = "all" ]; then
+          nix flake update
+        else
+          if [[ "$input" == *,,* || "$input" == ,* || "$input" == *, ]]; then
+            echo "Error: empty input segment detected in '$input'" >&2
+            exit 1
+          fi
+          set -f
+          IFS=','
+          set -- $input
+          for arg in "$@"; do
+            if [ "$arg" = "all" ]; then
+              echo "Error: 'all' cannot be used in a comma-separated list" >&2
+              exit 1
+            fi
+          done
+          nix flake update "$@"
+        fi
+
+  fmt:
+    desc: Format Nix files in place
+    cmds:
+      - nix fmt -- flake.nix hosts/ lib/ modules/ packages/ users/
+
+  lint:
+    desc: Check Nix file formatting without writing changes
+    cmds:
+      - nix fmt -- --check flake.nix hosts/ lib/ modules/ packages/ users/
+
+  check:
+    desc: Check nix flake
+    cmds:
+      - nix flake check --no-pure-eval
+
+  dev:
+    desc: Start a development shell
+    cmds:
+      - nix run nixpkgs#devenv -c devenv shell
+
+  run:
+    desc: Activate the configuration (use "-- --dry-run" for a dry run)
+    cmds:
+      - nix run .#activate -- {{.CLI_ARGS}}
